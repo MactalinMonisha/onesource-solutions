@@ -19,7 +19,7 @@ services:
       - key: Jwt__Audience
         value: OneSourceClient
       - key: ALLOWED_ORIGINS
-        value: "null,http://localhost:5500"
+        value: "null,https://mactalinmonisha.github.io"
 
 databases:
   - name: onesource-db

@@ -1084,8 +1084,8 @@
 
             const authHeaders = () => (authToken ? { 'Authorization': `Bearer ${authToken}` } : {});
 
-            const API_BASE = 'http://localhost:5055/api';
-            const CATEGORY_API_URL = 'http://localhost:5055/api/ProductCategories';
+            const API_BASE = 'https://onesource-api.onrender.com/api';
+            const CATEGORY_API_URL = 'https://onesource-api.onrender.com/api/ProductCategories';
 
             const loadCategories = async () => {
                 setCategoriesLoading(true);
@@ -1916,7 +1916,7 @@
                                     const currentImageId = currentImage ? (currentImage.productImageId || currentImage.id) : null;
                                     const rawImageUrl = currentImage ? (currentImage.imageUrl || currentImage.url) : null;
                                     const primaryImage = rawImageUrl
-                                        ? (rawImageUrl.startsWith('http') ? rawImageUrl : `http://localhost:5055${rawImageUrl}`)
+                                        ? (rawImageUrl.startsWith('http') ? rawImageUrl : `https://onesource-api.onrender.com${rawImageUrl}`)
                                         : null;
 
                                     return (
