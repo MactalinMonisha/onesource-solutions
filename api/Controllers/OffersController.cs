@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OneSource.Api.Data;
@@ -31,6 +32,7 @@ public class OffersController(AppDbContext db) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<OfferDto>> Create(CreateOfferDto dto)
     {
         var offer = new Offer
@@ -44,5 +46,31 @@ public class OffersController(AppDbContext db) : ControllerBase
 
         var result = new OfferDto(offer.OfferId, offer.OfferName, offer.Description, offer.IsActive);
         return CreatedAtAction(nameof(GetById), new { id = offer.OfferId }, result);
+    }
+
+    [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<OfferDto>> Update(int id, UpdateOfferDto dto)
+    {
+        var offer = await db.Offers.FindAsync(id);
+        if (offer is null || !offer.IsActive) return NotFound();
+
+        offer.OfferName = dto.OfferName;
+        offer.Description = dto.Description;
+        await db.SaveChangesAsync();
+
+        return Ok(new OfferDto(offer.OfferId, offer.OfferName, offer.Description, offer.IsActive));
+    }
+
+    [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var offer = await db.Offers.FindAsync(id);
+        if (offer is null || !offer.IsActive) return NotFound();
+
+        offer.IsActive = false; // soft delete
+        await db.SaveChangesAsync();
+        return NoContent();
     }
 }

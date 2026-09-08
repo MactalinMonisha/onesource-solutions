@@ -1091,6 +1091,18 @@
             const [editingTrustedCompanyName, setEditingTrustedCompanyName] = React.useState('');
             const [deletingTrustedCompanyId, setDeletingTrustedCompanyId] = React.useState(null);
 
+            const [offers, setOffers] = React.useState([]);
+            const [offersLoading, setOffersLoading] = React.useState(true);
+            const [showOfferForm, setShowOfferForm] = React.useState(false);
+            const [newOfferName, setNewOfferName] = React.useState('');
+            const [newOfferDescription, setNewOfferDescription] = React.useState('');
+            const [offerSubmitting, setOfferSubmitting] = React.useState(false);
+            const [offerMessage, setOfferMessage] = React.useState(null);
+            const [editingOfferId, setEditingOfferId] = React.useState(null);
+            const [editingOfferName, setEditingOfferName] = React.useState('');
+            const [editingOfferDescription, setEditingOfferDescription] = React.useState('');
+            const [deletingOfferId, setDeletingOfferId] = React.useState(null);
+
             const [authToken, setAuthToken] = React.useState(() => localStorage.getItem('authToken') || null);
             const [authUsername, setAuthUsername] = React.useState(() => localStorage.getItem('authUsername') || null);
             const [authRole, setAuthRole] = React.useState(() => localStorage.getItem('authRole') || null);
@@ -1173,6 +1185,25 @@
 
             React.useEffect(() => {
                 loadTrustedCompanies();
+            }, []);
+
+            const loadOffers = async () => {
+                setOffersLoading(true);
+                try {
+                    const response = await fetch(`${API_BASE}/Offers`);
+                    if (!response.ok) throw new Error(`Request failed (${response.status})`);
+                    const result = await response.json();
+                    setOffers(Array.isArray(result) ? result : []);
+                } catch (err) {
+                    console.error('Failed to load offers', err);
+                    setOffers([]);
+                } finally {
+                    setOffersLoading(false);
+                }
+            };
+
+            React.useEffect(() => {
+                loadOffers();
             }, []);
 
             React.useEffect(() => {
@@ -1457,6 +1488,116 @@
                     setTrustedCompanyMessage({ type: 'error', text: `Could not remove company: ${err.message}` });
                 } finally {
                     setDeletingTrustedCompanyId(null);
+                }
+            };
+
+            const addOffer = async (event) => {
+                event.preventDefault();
+                const trimmedName = newOfferName.trim();
+
+                if (!trimmedName) {
+                    setOfferMessage({ type: 'error', text: 'Offer name is required.' });
+                    return;
+                }
+
+                setOfferSubmitting(true);
+                setOfferMessage(null);
+
+                try {
+                    const response = await fetch(`${API_BASE}/Offers`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                        body: JSON.stringify({ offerName: trimmedName, description: newOfferDescription.trim() })
+                    });
+
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('You must be logged in as Admin to add an offer.');
+                    }
+                    if (!response.ok) {
+                        throw new Error(`Request failed (${response.status})`);
+                    }
+
+                    setNewOfferName('');
+                    setNewOfferDescription('');
+                    setOfferMessage({ type: 'success', text: 'Offer added successfully.' });
+                    loadOffers();
+                } catch (err) {
+                    setOfferMessage({ type: 'error', text: `Could not add offer: ${err.message}` });
+                } finally {
+                    setOfferSubmitting(false);
+                }
+            };
+
+            const startEditOffer = (offer) => {
+                setEditingOfferId(offer.offerId);
+                setEditingOfferName(offer.offerName);
+                setEditingOfferDescription(offer.description || '');
+                setOfferMessage(null);
+            };
+
+            const saveEditOffer = async (offerId) => {
+                const trimmedName = editingOfferName.trim();
+                if (!trimmedName) {
+                    setOfferMessage({ type: 'error', text: 'Offer name is required.' });
+                    return;
+                }
+
+                setOfferSubmitting(true);
+                setOfferMessage(null);
+
+                try {
+                    const response = await fetch(`${API_BASE}/Offers/${offerId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                        body: JSON.stringify({ offerName: trimmedName, description: editingOfferDescription.trim() })
+                    });
+
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('You must be logged in as Admin to edit an offer.');
+                    }
+                    if (!response.ok) {
+                        throw new Error(`Request failed (${response.status})`);
+                    }
+
+                    setEditingOfferId(null);
+                    setEditingOfferName('');
+                    setEditingOfferDescription('');
+                    setOfferMessage({ type: 'success', text: 'Offer updated successfully.' });
+                    loadOffers();
+                } catch (err) {
+                    setOfferMessage({ type: 'error', text: `Could not update offer: ${err.message}` });
+                } finally {
+                    setOfferSubmitting(false);
+                }
+            };
+
+            const deleteOffer = async (offerId, offerName) => {
+                if (!window.confirm(`Delete offer "${offerName}"? This cannot be undone.`)) {
+                    return;
+                }
+
+                setOfferMessage(null);
+                setDeletingOfferId(offerId);
+
+                try {
+                    const response = await fetch(`${API_BASE}/Offers/${offerId}`, {
+                        method: 'DELETE',
+                        headers: { ...authHeaders() }
+                    });
+
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('You must be logged in as Admin to delete an offer.');
+                    }
+                    if (!response.ok) {
+                        throw new Error(`Request failed (${response.status})`);
+                    }
+
+                    setOfferMessage({ type: 'success', text: `Offer "${offerName}" deleted successfully.` });
+                    loadOffers();
+                } catch (err) {
+                    setOfferMessage({ type: 'error', text: `Could not delete offer: ${err.message}` });
+                } finally {
+                    setDeletingOfferId(null);
                 }
             };
 
@@ -2286,6 +2427,117 @@
                                     );
                                 })}
                             </div>
+                        </div>
+                    </section>
+
+                    <section id="offers" className="section">
+                        <div className="container">
+                            <h2 className="section-title">Current Offers</h2>
+
+                            {isAdmin && (
+                            <div className="category-form" style={{marginBottom: '1.5rem'}}>
+                                <button
+                                    type="button"
+                                    className="enquire-btn"
+                                    onClick={() => {
+                                        setShowOfferForm((isVisible) => !isVisible);
+                                        setOfferMessage(null);
+                                    }}
+                                >
+                                    {showOfferForm ? 'Close Offer Form' : '+ Add Offer'}
+                                </button>
+
+                                {showOfferForm && (
+                                    <form onSubmit={addOffer} style={{marginTop: '1rem'}}>
+                                        <div className="category-form-fields">
+                                            <label>
+                                                Offer name
+                                                <input
+                                                    type="text"
+                                                    value={newOfferName}
+                                                    onChange={(event) => setNewOfferName(event.target.value)}
+                                                    placeholder="e.g. 10% Offer"
+                                                    required
+                                                />
+                                            </label>
+                                            <label>
+                                                Description
+                                                <input
+                                                    type="text"
+                                                    value={newOfferDescription}
+                                                    onChange={(event) => setNewOfferDescription(event.target.value)}
+                                                    placeholder="e.g. Purchase with product code HRKDNS908"
+                                                />
+                                            </label>
+                                            <button type="submit" className="enquire-btn" disabled={offerSubmitting}>
+                                                {offerSubmitting ? 'Adding...' : 'Save Offer'}
+                                            </button>
+                                        </div>
+                                    </form>
+                                )}
+
+                                {offerMessage && (
+                                    <p className={`category-form-message ${offerMessage.type}`} role="status">
+                                        {offerMessage.text}
+                                    </p>
+                                )}
+                            </div>
+                            )}
+
+                            {offersLoading ? (
+                                <p>Loading offers...</p>
+                            ) : offers.length === 0 ? (
+                                <p>No current offers. Check back soon!</p>
+                            ) : (
+                            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem', marginTop: '2rem'}}>
+                                {offers.map((offer) => (
+                                    <div key={offer.offerId} style={{background: 'white', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '1.2rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)'}}>
+                                        {editingOfferId === offer.offerId ? (
+                                            <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                                                <input
+                                                    type="text"
+                                                    value={editingOfferName}
+                                                    onChange={(event) => setEditingOfferName(event.target.value)}
+                                                    placeholder="Offer name"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    value={editingOfferDescription}
+                                                    onChange={(event) => setEditingOfferDescription(event.target.value)}
+                                                    placeholder="Description"
+                                                />
+                                                <div style={{display: 'flex', gap: '0.4rem'}}>
+                                                    <button type="button" className="enquire-btn" onClick={() => saveEditOffer(offer.offerId)} disabled={offerSubmitting}>Save</button>
+                                                    <button type="button" onClick={() => setEditingOfferId(null)}>Cancel</button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.6rem'}}>
+                                                    <h3 style={{color: '#ea580c', margin: 0, fontSize: '1.1rem'}}>🎁 {offer.offerName}</h3>
+                                                    {isAdmin && (
+                                                        <span style={{display: 'flex', gap: '0.4rem', flexShrink: 0}}>
+                                                            <button type="button" onClick={() => startEditOffer(offer)} title="Edit">✏️</button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => deleteOffer(offer.offerId, offer.offerName)}
+                                                                disabled={deletingOfferId === offer.offerId}
+                                                                title="Delete"
+                                                            >
+                                                                {deletingOfferId === offer.offerId ? '...' : '🗑️'}
+                                                            </button>
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                {offer.description && (
+                                                    <p style={{marginTop: '0.5rem', color: '#475569', fontSize: '0.9rem'}}>{offer.description}</p>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                            )}
                         </div>
                     </section>
 

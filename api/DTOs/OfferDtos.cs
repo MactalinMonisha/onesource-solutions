@@ -11,3 +11,8 @@ public record CreateOfferDto(
     string OfferName,
     string? Description
 );
+
+public record UpdateOfferDto(
+    string OfferName,
+    string? Description
+);

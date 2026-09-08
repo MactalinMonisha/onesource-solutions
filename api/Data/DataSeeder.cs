@@ -12,6 +12,7 @@ public static class DataSeeder
         await SeedAdminUserAsync(db);
         await SeedContactAsync(db);
         await SeedTrustedCompaniesAsync(db);
+        await SeedOffersAsync(db);
 
         if (await db.ProductCategories.AnyAsync()) return;
 
@@ -121,6 +122,19 @@ public static class DataSeeder
         };
 
         db.TrustedCompanies.AddRange(names.Select(n => new TrustedCompany { CompanyName = n }));
+        await db.SaveChangesAsync();
+    }
+
+    private static async Task SeedOffersAsync(AppDbContext db)
+    {
+        if (await db.Offers.AnyAsync()) return;
+
+        db.Offers.Add(new Offer
+        {
+            OfferName = "10% Offer",
+            Description = "Purchase with product code HRKDNS908",
+        });
+
         await db.SaveChangesAsync();
     }
 }
