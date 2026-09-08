@@ -20,6 +20,12 @@ namespace OneSource.Api.Models
         [EmailAddress]
         public string? Email { get; set; }
 
+        [MaxLength(500)]
+        public string? Location { get; set; }
+
+        [MaxLength(255)]
+        public string? Website { get; set; }
+
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
     }

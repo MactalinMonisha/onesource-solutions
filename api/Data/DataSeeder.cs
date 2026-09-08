@@ -10,6 +10,8 @@ public static class DataSeeder
     public static async Task SeedAsync(AppDbContext db)
     {
         await SeedAdminUserAsync(db);
+        await SeedContactAsync(db);
+        await SeedTrustedCompaniesAsync(db);
 
         if (await db.ProductCategories.AnyAsync()) return;
 
@@ -72,6 +74,53 @@ public static class DataSeeder
         admin.PasswordHash = hasher.HashPassword(admin, "Admin@123");
 
         db.Users.Add(admin);
+        await db.SaveChangesAsync();
+    }
+
+    private static async Task SeedContactAsync(AppDbContext db)
+    {
+        if (await db.Contacts.AnyAsync()) return;
+
+        db.Contacts.Add(new Contact
+        {
+            Phone = "+254207903190",
+            WhatsApp = "+254735610610",
+            Email = "info@onesourcesolutionske.com",
+            Location = "Office No 7E, 7th Floor, TRV Centre Building, 3rd Avenue Parklands, Nairobi",
+            Website = "https://www.onesourcesolutionske.com",
+        });
+
+        await db.SaveChangesAsync();
+    }
+
+    private static async Task SeedTrustedCompaniesAsync(AppDbContext db)
+    {
+        if (await db.TrustedCompanies.AnyAsync()) return;
+
+        var names = new[]
+        {
+            "Total Energies Limited",
+            "Kenya Ports Authority",
+            "Kenafric Industries Limited",
+            "Tropical Heat Limited",
+            "Hotpoint Limited",
+            "Healthy U Ltd",
+            "Roche Kenya Ltd",
+            "Ramco Group of Companies",
+            "Simbisa Brands Kenya Limited",
+            "Good Life Pharmacy",
+            "Airtel Kenya Limited",
+            "Auto Xpress Limited",
+            "Mastermind Tobacco Limited",
+            "Black Tulip Group of Companies",
+            "Kingsway Tyres Limited",
+            "CFAO Kenya Ltd (Toyota)",
+            "PKF Kenya Limited",
+            "Kenya Revenue Authority",
+            "Dalbit Petroleum Limited",
+        };
+
+        db.TrustedCompanies.AddRange(names.Select(n => new TrustedCompany { CompanyName = n }));
         await db.SaveChangesAsync();
     }
 }

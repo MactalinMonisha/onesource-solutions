@@ -1070,6 +1070,27 @@
             const [imageIndexByProduct, setImageIndexByProduct] = React.useState({});
             const [deletingImageId, setDeletingImageId] = React.useState(null);
 
+            const [contact, setContact] = React.useState(null);
+            const [contactLoading, setContactLoading] = React.useState(true);
+            const [showContactForm, setShowContactForm] = React.useState(false);
+            const [contactPhone, setContactPhone] = React.useState('');
+            const [contactWhatsApp, setContactWhatsApp] = React.useState('');
+            const [contactEmail, setContactEmail] = React.useState('');
+            const [contactLocation, setContactLocation] = React.useState('');
+            const [contactWebsite, setContactWebsite] = React.useState('');
+            const [contactSubmitting, setContactSubmitting] = React.useState(false);
+            const [contactMessage, setContactMessage] = React.useState(null);
+
+            const [trustedCompanies, setTrustedCompanies] = React.useState([]);
+            const [trustedCompaniesLoading, setTrustedCompaniesLoading] = React.useState(true);
+            const [showTrustedCompanyForm, setShowTrustedCompanyForm] = React.useState(false);
+            const [newTrustedCompanyName, setNewTrustedCompanyName] = React.useState('');
+            const [trustedCompanySubmitting, setTrustedCompanySubmitting] = React.useState(false);
+            const [trustedCompanyMessage, setTrustedCompanyMessage] = React.useState(null);
+            const [editingTrustedCompanyId, setEditingTrustedCompanyId] = React.useState(null);
+            const [editingTrustedCompanyName, setEditingTrustedCompanyName] = React.useState('');
+            const [deletingTrustedCompanyId, setDeletingTrustedCompanyId] = React.useState(null);
+
             const [authToken, setAuthToken] = React.useState(() => localStorage.getItem('authToken') || null);
             const [authUsername, setAuthUsername] = React.useState(() => localStorage.getItem('authUsername') || null);
             const [authRole, setAuthRole] = React.useState(() => localStorage.getItem('authRole') || null);
@@ -1112,6 +1133,48 @@
                 loadCategories();
             }, []);
 
+            const loadContact = async () => {
+                setContactLoading(true);
+                try {
+                    const response = await fetch(`${API_BASE}/Contact`);
+                    if (!response.ok) throw new Error(`Request failed (${response.status})`);
+                    const result = await response.json();
+                    setContact(result);
+                    setContactPhone(result.phone || '');
+                    setContactWhatsApp(result.whatsApp || '');
+                    setContactEmail(result.email || '');
+                    setContactLocation(result.location || '');
+                    setContactWebsite(result.website || '');
+                } catch (err) {
+                    console.error('Failed to load contact info', err);
+                } finally {
+                    setContactLoading(false);
+                }
+            };
+
+            React.useEffect(() => {
+                loadContact();
+            }, []);
+
+            const loadTrustedCompanies = async () => {
+                setTrustedCompaniesLoading(true);
+                try {
+                    const response = await fetch(`${API_BASE}/TrustedCompanies`);
+                    if (!response.ok) throw new Error(`Request failed (${response.status})`);
+                    const result = await response.json();
+                    setTrustedCompanies(Array.isArray(result) ? result : []);
+                } catch (err) {
+                    console.error('Failed to load trusted companies', err);
+                    setTrustedCompanies([]);
+                } finally {
+                    setTrustedCompaniesLoading(false);
+                }
+            };
+
+            React.useEffect(() => {
+                loadTrustedCompanies();
+            }, []);
+
             React.useEffect(() => {
                 const categoryId = activeTab === 'all' ? 0 : activeTab;
                 const url = `${API_BASE}/Products/by-category/${categoryId}`;
@@ -1126,7 +1189,8 @@
             const sendWhatsAppMessage = (productName) => {
                 const message = `Hi! I'm interested in enquiring about "${productName}". Could you please provide more details about this solution? Thank you!`;
                 const encodedMessage = encodeURIComponent(message);
-                const whatsappURL = `https://wa.me/254700708695?text=${encodedMessage}`;
+                const waNumber = (contact?.whatsApp || '+254735610610').replace(/[^0-9]/g, '');
+                const whatsappURL = `https://wa.me/${waNumber}?text=${encodedMessage}`;
                 window.open(whatsappURL, '_blank');
             };
 
@@ -1249,6 +1313,150 @@
                     setCategoryMessage({ type: 'error', text: `Could not delete category: ${err.message}` });
                 } finally {
                     setDeletingCategoryId(null);
+                }
+            };
+
+            const updateContact = async (event) => {
+                event.preventDefault();
+
+                setContactSubmitting(true);
+                setContactMessage(null);
+
+                try {
+                    const response = await fetch(`${API_BASE}/Contact`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                        body: JSON.stringify({
+                            phone: contactPhone.trim(),
+                            whatsApp: contactWhatsApp.trim(),
+                            email: contactEmail.trim(),
+                            location: contactLocation.trim(),
+                            website: contactWebsite.trim()
+                        })
+                    });
+
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('You must be logged in as Admin to update contact details.');
+                    }
+                    if (!response.ok) {
+                        throw new Error(`Request failed (${response.status})`);
+                    }
+
+                    const result = await response.json();
+                    setContact(result);
+                    setContactMessage({ type: 'success', text: 'Contact details updated successfully.' });
+                    setShowContactForm(false);
+                } catch (err) {
+                    setContactMessage({ type: 'error', text: `Could not update contact details: ${err.message}` });
+                } finally {
+                    setContactSubmitting(false);
+                }
+            };
+
+            const addTrustedCompany = async (event) => {
+                event.preventDefault();
+                const trimmedName = newTrustedCompanyName.trim();
+
+                if (!trimmedName) {
+                    setTrustedCompanyMessage({ type: 'error', text: 'Company name is required.' });
+                    return;
+                }
+
+                setTrustedCompanySubmitting(true);
+                setTrustedCompanyMessage(null);
+
+                try {
+                    const response = await fetch(`${API_BASE}/TrustedCompanies`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                        body: JSON.stringify({ companyName: trimmedName })
+                    });
+
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('You must be logged in as Admin to add a company.');
+                    }
+                    if (!response.ok) {
+                        throw new Error(`Request failed (${response.status})`);
+                    }
+
+                    setNewTrustedCompanyName('');
+                    setTrustedCompanyMessage({ type: 'success', text: 'Company added successfully.' });
+                    loadTrustedCompanies();
+                } catch (err) {
+                    setTrustedCompanyMessage({ type: 'error', text: `Could not add company: ${err.message}` });
+                } finally {
+                    setTrustedCompanySubmitting(false);
+                }
+            };
+
+            const startEditTrustedCompany = (company) => {
+                setEditingTrustedCompanyId(company.trustedCompanyId);
+                setEditingTrustedCompanyName(company.companyName);
+                setTrustedCompanyMessage(null);
+            };
+
+            const saveEditTrustedCompany = async (companyId) => {
+                const trimmedName = editingTrustedCompanyName.trim();
+                if (!trimmedName) {
+                    setTrustedCompanyMessage({ type: 'error', text: 'Company name is required.' });
+                    return;
+                }
+
+                setTrustedCompanySubmitting(true);
+                setTrustedCompanyMessage(null);
+
+                try {
+                    const response = await fetch(`${API_BASE}/TrustedCompanies/${companyId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                        body: JSON.stringify({ companyName: trimmedName })
+                    });
+
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('You must be logged in as Admin to edit a company.');
+                    }
+                    if (!response.ok) {
+                        throw new Error(`Request failed (${response.status})`);
+                    }
+
+                    setEditingTrustedCompanyId(null);
+                    setEditingTrustedCompanyName('');
+                    setTrustedCompanyMessage({ type: 'success', text: 'Company updated successfully.' });
+                    loadTrustedCompanies();
+                } catch (err) {
+                    setTrustedCompanyMessage({ type: 'error', text: `Could not update company: ${err.message}` });
+                } finally {
+                    setTrustedCompanySubmitting(false);
+                }
+            };
+
+            const deleteTrustedCompany = async (companyId, companyName) => {
+                if (!window.confirm(`Remove "${companyName}" from trusted companies?`)) {
+                    return;
+                }
+
+                setTrustedCompanyMessage(null);
+                setDeletingTrustedCompanyId(companyId);
+
+                try {
+                    const response = await fetch(`${API_BASE}/TrustedCompanies/${companyId}`, {
+                        method: 'DELETE',
+                        headers: { ...authHeaders() }
+                    });
+
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('You must be logged in as Admin to remove a company.');
+                    }
+                    if (!response.ok) {
+                        throw new Error(`Request failed (${response.status})`);
+                    }
+
+                    setTrustedCompanyMessage({ type: 'success', text: `"${companyName}" removed successfully.` });
+                    loadTrustedCompanies();
+                } catch (err) {
+                    setTrustedCompanyMessage({ type: 'error', text: `Could not remove company: ${err.message}` });
+                } finally {
+                    setDeletingTrustedCompanyId(null);
                 }
             };
 
@@ -1490,9 +1698,9 @@
                                             Contact <span>▼</span>
                                         </button>
                                         <div className="dropdown-menu">
-                                            <a href="mailto:info@onesourcesolutionske.com">📧 Email</a>
-                                            <a href="https://wa.me/254700708695" target="_blank" rel="noreferrer">📱 WhatsApp</a>
-                                            <a href="tel:+254207903190">☎️ Phone</a>
+                                            <a href={`mailto:${contact?.email || 'info@onesourcesolutionske.com'}`}>📧 Email</a>
+                                            <a href={`https://wa.me/${(contact?.whatsApp || '+254735610610').replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer">📱 WhatsApp</a>
+                                            <a href={`tel:${contact?.phone || '+254207903190'}`}>☎️ Phone</a>
                                             <a href="https://maps.google.com/?q=OneSource+Solutions+Kenya" target="_blank" rel="noreferrer">📍 Location</a>
                                         </div>
                                     </div>
@@ -2084,34 +2292,90 @@
                     <section className="section">
                         <div className="container">
                             <h2 className="section-title">Trusted by Leading Companies</h2>
+
+                            {isAdmin && (
+                            <div className="category-form" style={{marginBottom: '1.5rem'}}>
+                                <button
+                                    type="button"
+                                    className="enquire-btn"
+                                    onClick={() => {
+                                        setShowTrustedCompanyForm((isVisible) => !isVisible);
+                                        setTrustedCompanyMessage(null);
+                                    }}
+                                >
+                                    {showTrustedCompanyForm ? 'Close Company Form' : '+ Add Trusted Company'}
+                                </button>
+
+                                {showTrustedCompanyForm && (
+                                    <form onSubmit={addTrustedCompany} style={{marginTop: '1rem'}}>
+                                        <div className="category-form-fields">
+                                            <label>
+                                                Company name
+                                                <input
+                                                    type="text"
+                                                    value={newTrustedCompanyName}
+                                                    onChange={(event) => setNewTrustedCompanyName(event.target.value)}
+                                                    placeholder="e.g. Acme Corporation"
+                                                    required
+                                                />
+                                            </label>
+                                            <button type="submit" className="enquire-btn" disabled={trustedCompanySubmitting}>
+                                                {trustedCompanySubmitting ? 'Adding...' : 'Save Company'}
+                                            </button>
+                                        </div>
+                                    </form>
+                                )}
+
+                                {trustedCompanyMessage && (
+                                    <p className={`category-form-message ${trustedCompanyMessage.type}`} role="status">
+                                        {trustedCompanyMessage.text}
+                                    </p>
+                                )}
+                            </div>
+                            )}
+
+                            {trustedCompaniesLoading ? (
+                                <p>Loading trusted companies...</p>
+                            ) : (
                             <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem', marginTop: '2rem'}}>
-                                {[
-                                    'Total Energies Limited',
-                                    'Kenya Ports Authority',
-                                    'Kenafric Industries Limited',
-                                    'Tropical Heat Limited',
-                                    'Hotpoint Limited',
-                                    'Healthy U Ltd',
-                                    'Roche Kenya Ltd',
-                                    'Ramco Group of Companies',
-                                    'Simbisa Brands Kenya Limited',
-                                    'Good Life Pharmacy',
-                                    'Airtel Kenya Limited',
-                                    'Auto Xpress Limited',
-                                    'Mastermind Tobacco Limited',
-                                    'Black Tulip Group of Companies',
-                                    'Kingsway Tyres Limited',
-                                    'CFAO Kenya Ltd (Toyota)',
-                                    'PKF Kenya Limited',
-                                    'Kenya Revenue Authority',
-                                    'Dalbit Petroleum Limited'
-                                ].map((client, idx) => (
-                                    <div key={idx} style={{background: 'white', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '1rem 1.2rem', display: 'flex', alignItems: 'center', gap: '0.6rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', fontWeight: 600, color: '#1e40af', fontSize: '0.9rem'}}>
-                                        <span style={{color: '#ea580c', fontWeight: 800}}>✓</span>
-                                        {client}
+                                {trustedCompanies.map((client) => (
+                                    <div key={client.trustedCompanyId} style={{background: 'white', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '1rem 1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.6rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', fontWeight: 600, color: '#1e40af', fontSize: '0.9rem'}}>
+                                        {editingTrustedCompanyId === client.trustedCompanyId ? (
+                                            <div style={{display: 'flex', gap: '0.4rem', width: '100%'}}>
+                                                <input
+                                                    type="text"
+                                                    value={editingTrustedCompanyName}
+                                                    onChange={(event) => setEditingTrustedCompanyName(event.target.value)}
+                                                    style={{flex: 1, minWidth: 0}}
+                                                />
+                                                <button type="button" className="enquire-btn" onClick={() => saveEditTrustedCompany(client.trustedCompanyId)} disabled={trustedCompanySubmitting}>Save</button>
+                                                <button type="button" onClick={() => setEditingTrustedCompanyId(null)}>Cancel</button>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <span style={{display: 'flex', alignItems: 'center', gap: '0.6rem'}}>
+                                                    <span style={{color: '#ea580c', fontWeight: 800}}>✓</span>
+                                                    {client.companyName}
+                                                </span>
+                                                {isAdmin && (
+                                                    <span style={{display: 'flex', gap: '0.4rem'}}>
+                                                        <button type="button" onClick={() => startEditTrustedCompany(client)} title="Edit">✏️</button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => deleteTrustedCompany(client.trustedCompanyId, client.companyName)}
+                                                            disabled={deletingTrustedCompanyId === client.trustedCompanyId}
+                                                            title="Remove"
+                                                        >
+                                                            {deletingTrustedCompanyId === client.trustedCompanyId ? '...' : '🗑️'}
+                                                        </button>
+                                                    </span>
+                                                )}
+                                            </>
+                                        )}
                                     </div>
                                 ))}
                             </div>
+                            )}
                         </div>
                     </section>
 
@@ -2120,25 +2384,79 @@
                             <h2>Get In Touch With Us</h2>
                             <p>Whether you're purchasing for personal use or your business, we're here to help you choose the right products and solutions.</p>
 
+                            {isAdmin && (
+                            <div className="category-form" style={{marginBottom: '1.5rem'}}>
+                                <button
+                                    type="button"
+                                    className="enquire-btn"
+                                    onClick={() => {
+                                        setShowContactForm((isVisible) => !isVisible);
+                                        setContactMessage(null);
+                                    }}
+                                >
+                                    {showContactForm ? 'Close Contact Form' : '✏️ Edit Contact Details'}
+                                </button>
+
+                                {showContactForm && (
+                                    <form onSubmit={updateContact} style={{marginTop: '1rem'}}>
+                                        <div className="category-form-fields">
+                                            <label>
+                                                Phone
+                                                <input type="text" value={contactPhone} onChange={(event) => setContactPhone(event.target.value)} placeholder="+254207903190" />
+                                            </label>
+                                            <label>
+                                                WhatsApp number
+                                                <input type="text" value={contactWhatsApp} onChange={(event) => setContactWhatsApp(event.target.value)} placeholder="+254735610610" />
+                                            </label>
+                                            <label>
+                                                Email
+                                                <input type="email" value={contactEmail} onChange={(event) => setContactEmail(event.target.value)} placeholder="info@onesourcesolutionske.com" />
+                                            </label>
+                                            <label>
+                                                Location
+                                                <input type="text" value={contactLocation} onChange={(event) => setContactLocation(event.target.value)} placeholder="Office address" />
+                                            </label>
+                                            <label>
+                                                Website
+                                                <input type="text" value={contactWebsite} onChange={(event) => setContactWebsite(event.target.value)} placeholder="https://www.onesourcesolutionske.com" />
+                                            </label>
+                                            <button type="submit" className="enquire-btn" disabled={contactSubmitting}>
+                                                {contactSubmitting ? 'Saving...' : 'Save Contact Details'}
+                                            </button>
+                                        </div>
+                                    </form>
+                                )}
+
+                                {contactMessage && (
+                                    <p className={`category-form-message ${contactMessage.type}`} role="status">
+                                        {contactMessage.text}
+                                    </p>
+                                )}
+                            </div>
+                            )}
+
+                            {contactLoading ? (
+                                <p>Loading contact details...</p>
+                            ) : (
                             <div className="contact-info">
-                                <a href="mailto:info@onesourcesolutionske.com" className="contact-card">
+                                <a href={`mailto:${contact?.email || 'info@onesourcesolutionske.com'}`} className="contact-card">
                                     <strong>📧 Email</strong>
-                                    <span>info@onesourcesolutionske.com</span>
+                                    <span>{contact?.email || 'info@onesourcesolutionske.com'}</span>
                                 </a>
 
-                                <a href="https://wa.me/254700708695" target="_blank" rel="noreferrer" className="contact-card">
+                                <a href={`https://wa.me/${(contact?.whatsApp || '+254735610610').replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" className="contact-card">
                                     <strong>📱 WhatsApp</strong>
-                                    <span>+254 700 708695</span>
+                                    <span>{contact?.whatsApp || '+254 735 610610'}</span>
                                 </a>
 
-                                <a href="tel:+254207903190" className="contact-card">
+                                <a href={`tel:${contact?.phone || '+254207903190'}`} className="contact-card">
                                     <strong>☎️ Phone</strong>
-                                    <span>020 7903190 / 0700 708695</span>
+                                    <span>{contact?.phone || '020 7903190'}</span>
                                 </a>
 
-                                <a href="https://maps.google.com/?q=TRV+Centre+Building+3rd+Avenue+Parklands+Nairobi" target="_blank" rel="noreferrer" className="contact-card">
+                                <a href={`https://maps.google.com/?q=${encodeURIComponent(contact?.location || 'Nairobi, Kenya')}`} target="_blank" rel="noreferrer" className="contact-card">
                                     <strong>📍 Location</strong>
-                                    <span>Office No 7E, 7th Floor, TRV Centre Building, 3rd Avenue Parklands, Nairobi</span>
+                                    <span>{contact?.location || 'Nairobi, Kenya'}</span>
                                 </a>
 
                                 <div className="contact-card">
@@ -2146,20 +2464,21 @@
                                     <span>P.O. Box 221 – 00623, Nairobi, Kenya</span>
                                 </div>
 
-                                <a href="https://www.onesourcesolutionske.com" target="_blank" rel="noreferrer" className="contact-card">
+                                <a href={contact?.website || 'https://www.onesourcesolutionske.com'} target="_blank" rel="noreferrer" className="contact-card">
                                     <strong>🌐 Website</strong>
-                                    <span>www.onesourcesolutionske.com</span>
+                                    <span>{contact?.website || 'www.onesourcesolutionske.com'}</span>
                                 </a>
                             </div>
+                            )}
                         </div>
                     </section>
 
                     <footer>
                         <p>&copy; 2025 OneSource Solutions Limited. All rights reserved.</p>
                         <p style={{marginTop: '1rem', fontSize: '0.9rem'}}>
-                            <a href="mailto:info@onesourcesolutionske.com">Contact</a>
-                            <a href="https://wa.me/254700708695">WhatsApp</a>
-                            <a href="tel:+254207903190">Phone</a>
+                            <a href={`mailto:${contact?.email || 'info@onesourcesolutionske.com'}`}>Contact</a>
+                            <a href={`https://wa.me/${(contact?.whatsApp || '+254735610610').replace(/[^0-9]/g, '')}`}>WhatsApp</a>
+                            <a href={`tel:${contact?.phone || '+254207903190'}`}>Phone</a>
                         </p>
                         <p style={{marginTop: '1rem', fontSize: '0.8rem', opacity: 0.7}}>
                             ICT Solutions for Business Growth • KRA Licensed • 24/7 Support

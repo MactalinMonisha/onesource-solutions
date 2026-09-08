@@ -11,6 +11,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<User> Users => Set<User>();
     public DbSet<Contact> Contacts => Set<Contact>();
     public DbSet<Offer> Offers => Set<Offer>();
+    public DbSet<TrustedCompany> TrustedCompanies => Set<TrustedCompany>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -57,12 +58,20 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(c => c.Phone).HasMaxLength(20);
             e.Property(c => c.WhatsApp).HasMaxLength(20);
             e.Property(c => c.Email).HasMaxLength(255);
+            e.Property(c => c.Location).HasMaxLength(500);
+            e.Property(c => c.Website).HasMaxLength(255);
         });
 
         modelBuilder.Entity<Offer>(e =>
         {
             e.HasKey(o => o.OfferId);
             e.Property(o => o.OfferName).IsRequired().HasMaxLength(200);
+        });
+
+        modelBuilder.Entity<TrustedCompany>(e =>
+        {
+            e.HasKey(c => c.TrustedCompanyId);
+            e.Property(c => c.CompanyName).IsRequired().HasMaxLength(200);
         });
     }
 
