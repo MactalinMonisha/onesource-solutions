@@ -1,0 +1,10 @@
+## .NET
+api/bin/
+api/obj/
+api/.vs/
+*.user
+
+## OS/editor
+.vscode/
+Thumbs.db
+.DS_Store

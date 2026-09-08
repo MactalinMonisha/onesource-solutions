@@ -1,0 +1,2176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneSource Solutions - ICT Solutions for Business Growth</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        :root {
+            --bg: #f4f7ff;
+            --surface: #ffffff;
+            --surface-soft: #f8fafc;
+            --primary: #0f172a;
+            --primary-strong: #1d4ed8;
+            --primary-soft: #dbeafe;
+            --accent: #f97316;
+            --accent-soft: #fff1e9;
+            --text: #0f172a;
+            --muted: #475569;
+            --line: rgba(15, 23, 42, 0.08);
+            --shadow: 0 18px 50px rgba(15, 23, 42, 0.12);
+            --shadow-soft: 0 12px 30px rgba(15, 23, 42, 0.08);
+            --radius-xl: 28px;
+            --radius-lg: 22px;
+            --radius-md: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
+        }
+
+        header {
+            background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover {
+            opacity: 0.8;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-button {
+            background: none;
+            border: none;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: opacity 0.3s;
+            font-size: 1rem;
+            padding: 0;
+        }
+
+        .dropdown-button:hover {
+            opacity: 0.8;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+            border-radius: 6px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            margin-top: 0.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            animation: slideUp 0.4s ease;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #333 !important;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 400;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropdown-menu a::before {
+            content: '';
+            position: absolute;
+            left: -100%;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(30, 64, 175, 0.1);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .dropdown-menu a:hover::before {
+            left: 0;
+        }
+
+        .dropdown-menu a:first-child {
+            border-radius: 6px 6px 0 0;
+        }
+
+        .dropdown-menu a:last-child {
+            border-radius: 0 0 6px 6px;
+        }
+
+        .dropdown-menu a:hover {
+            background: #1e40af;
+            color: white !important;
+            padding-left: 1.5rem;
+            transform: translateX(3px);
+        }
+
+        .hero {
+            position: relative;
+            color: white;
+            padding: 5.5rem 2rem 4.5rem;
+            background: radial-gradient(circle at top left, rgba(96, 165, 250, 0.3), transparent 30%),
+                        radial-gradient(circle at bottom right, rgba(249, 115, 22, 0.24), transparent 25%),
+                        linear-gradient(135deg, #0f172a 0%, #111f52 38%, #1d4ed8 100%);
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: -15% -10% auto auto;
+            width: 420px;
+            height: 420px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            filter: blur(10px);
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            left: 10%;
+            bottom: -160px;
+            width: 380px;
+            height: 380px;
+            border-radius: 50%;
+            background: rgba(249, 115, 22, 0.12);
+            filter: blur(20px);
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 2rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-copy {
+            text-align: left;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.9rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.6rem, 5vw, 4.6rem);
+            line-height: 1.02;
+            margin-bottom: 1.2rem;
+            letter-spacing: -0.06em;
+            max-width: 680px;
+            text-shadow: 0 18px 30px rgba(0, 0, 0, 0.18);
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.94;
+            line-height: 1.8;
+            max-width: 620px;
+        }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            color: white;
+            padding: 1rem 1.7rem;
+            border: none;
+            border-radius: 999px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            box-shadow: 0 12px 30px rgba(249, 115, 22, 0.35);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 35px rgba(249, 115, 22, 0.45);
+        }
+
+        .cta-button.secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: none;
+        }
+
+        .cta-button.secondary:hover {
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .hero-panel {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            box-shadow: 0 30px 60px rgba(15, 23, 42, 0.2);
+            backdrop-filter: blur(18px);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.1rem;
+        }
+
+        .panel-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.76rem;
+            color: #dfe9ff;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding: 0.5rem 0.7rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .panel-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #34d399;
+            box-shadow: 0 0 0 6px rgba(52, 211, 153, 0.18);
+        }
+
+        .panel-metric {
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: -0.06em;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .panel-subtitle {
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 0.98rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .panel-list {
+            list-style: none;
+            display: grid;
+            gap: 0.75rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .panel-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            font-size: 0.95rem;
+            color: white;
+        }
+
+        .panel-list li::before {
+            content: '✓';
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background: rgba(52, 211, 153, 0.2);
+            color: #a7f3d0;
+            border-radius: 50%;
+            font-weight: 800;
+        }
+
+        .mini-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.8rem;
+        }
+
+        .mini-card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 0.85rem 0.7rem;
+            text-align: center;
+        }
+
+        .mini-card strong {
+            display: block;
+            font-size: 1.15rem;
+            color: white;
+        }
+
+        .mini-card span {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #1e40af;
+            animation: slideUp 0.6s ease;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #1e40af, #ea580c);
+            border-radius: 2px;
+            animation: slideInRight 0.8s ease 0.3s backwards;
+        }
+
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            padding: 0.7rem 1rem;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+            animation: scaleIn 0.6s ease both;
+            transition: all 0.3s;
+        }
+
+        .badge:nth-child(1) { animation-delay: 0.5s; }
+        .badge:nth-child(2) { animation-delay: 0.6s; }
+        .badge:nth-child(3) { animation-delay: 0.7s; }
+
+        .badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 24px rgba(15, 23, 42, 0.16);
+        }
+
+        .hero-badges {
+            justify-content: flex-start;
+            margin-top: 1.7rem;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            border-radius: 10px;
+            background: #f8f9fa;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+            border-left: 5px solid #1e40af;
+            animation: slideInUp 0.6s ease both;
+        }
+
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(4) { animation-delay: 0.4s; }
+        .feature-card:nth-child(5) { animation-delay: 0.5s; }
+        .feature-card:nth-child(6) { animation-delay: 0.6s; }
+
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15), 0 0 20px rgba(30, 64, 175, 0.3);
+            border-left-color: #ea580c;
+            animation: none;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: float 3s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        .feature-card:hover .feature-icon {
+            animation: rotateIcon 0.6s ease;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #1e40af;
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .service-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            border-top: 4px solid #ea580c;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            animation: scaleIn 0.6s ease both;
+        }
+
+        .service-card:nth-child(1) { animation-delay: 0.1s; }
+        .service-card:nth-child(2) { animation-delay: 0.2s; }
+        .service-card:nth-child(3) { animation-delay: 0.3s; }
+        .service-card:nth-child(4) { animation-delay: 0.4s; }
+        .service-card:nth-child(5) { animation-delay: 0.5s; }
+
+        .service-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+            transform: translateY(-8px) rotateY(2deg);
+            border-top-color: #1e40af;
+            background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+        }
+
+        .service-tag {
+            display: inline-block;
+            background: #1e40af;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            animation: slideInLeft 0.5s ease;
+        }
+
+        .service-card:hover .service-tag {
+            animation: pulse 0.6s ease;
+            background: #ea580c;
+        }
+
+        .service-card h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .service-card p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .products-section {
+            background: #f8f9fa;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: slideUp 0.6s ease both;
+        }
+
+        .product-card:nth-child(1) { animation-delay: 0.1s; }
+        .product-card:nth-child(2) { animation-delay: 0.2s; }
+        .product-card:nth-child(3) { animation-delay: 0.3s; }
+        .product-card:nth-child(4) { animation-delay: 0.4s; }
+        .product-card:nth-child(5) { animation-delay: 0.5s; }
+        .product-card:nth-child(6) { animation-delay: 0.6s; }
+
+        .product-card:hover {
+            transform: translateY(-12px) rotateX(5deg);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.2), 0 0 30px rgba(234, 88, 12, 0.3);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover img {
+            transform: scale(1.1) rotate(2deg);
+        }
+
+        .product-body {
+            padding: 1.5rem;
+        }
+
+        .product-body h3 {
+            color: #1e40af;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .product-body p {
+            color: #666;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .category-form {
+            max-width: 720px;
+            margin: 0 auto 2rem;
+            padding: 1.25rem;
+            background: white;
+            border: 1px solid #dbe4f0;
+            border-radius: 10px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+        }
+
+        .category-form-fields {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) auto;
+            gap: 0.75rem;
+            align-items: end;
+        }
+
+        .category-form label {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            color: #334155;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .category-form input,
+        .category-form select {
+            width: 100%;
+            padding: 0.7rem 0.8rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            color: #1e293b;
+            font: inherit;
+        }
+
+        .category-form input:focus,
+        .category-form select:focus {
+            outline: 2px solid rgba(30, 64, 175, 0.25);
+            border-color: #1e40af;
+        }
+
+        .category-form-message {
+            margin: 0.75rem 0 0;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .category-form-message.success {
+            color: #15803d;
+        }
+
+        .category-form-message.error {
+            color: #dc2626;
+        }
+
+        @media (max-width: 700px) {
+            .category-form-fields {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .enquire-btn {
+            display: inline-block;
+            background: #ea580c;
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .enquire-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .enquire-btn:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .enquire-btn:hover {
+            background: #c9480a;
+            transform: translateX(5px) scale(1.05);
+            box-shadow: 0 5px 15px rgba(202, 72, 10, 0.4);
+        }
+
+        .contact-section {
+            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+            color: white;
+            padding: 4rem 2rem;
+            border-radius: 10px;
+            margin: 3rem 0;
+        }
+
+        .contact-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .contact-card {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s;
+            animation: slideUp 0.6s ease both;
+            backdrop-filter: blur(10px);
+        }
+
+        .contact-card:nth-child(1) { animation-delay: 0.1s; }
+        .contact-card:nth-child(2) { animation-delay: 0.2s; }
+        .contact-card:nth-child(3) { animation-delay: 0.3s; }
+        .contact-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .contact-card:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3), inset 0 0 20px rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .contact-card strong {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            animation: none;
+        }
+
+        .contact-card:hover strong {
+            animation: none;
+        }
+
+        .contact-card span {
+            display: block;
+            font-size: 0.95rem;
+            opacity: 0.9;
+            transition: all 0.3s;
+        }
+
+        .contact-card:hover span {
+            opacity: 1;
+            transform: translateX(3px);
+        }
+
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: white;
+            color: #1e40af;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+            margin: 0 1rem;
+            transition: opacity 0.3s;
+        }
+
+        footer a:hover {
+            opacity: 0.7;
+        }
+
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeOut 3s ease forwards;
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                visibility: visible;
+            }
+            80% {
+                opacity: 1;
+                visibility: visible;
+            }
+            100% {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+        .splash-content {
+            text-align: center;
+            animation: scaleIn 0.8s ease;
+        }
+
+        .splash-logo {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 20px;
+            margin: 0 auto 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4rem;
+            animation: bounce 1s ease-in-out infinite;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .splash-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            animation: slideUp 0.8s ease;
+        }
+
+        .logo-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            animation: rotateIcon 0.6s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(30, 64, 175, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(30, 64, 175, 0.6);
+            }
+        }
+
+        @keyframes rotateIcon {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function SalesPage() {
+            const [activeTab, setActiveTab] = React.useState('all');
+            const [products, setProducts] = React.useState([]);
+            const [loading, setLoading] = React.useState(true);
+            const [error, setError] = React.useState(null);
+            const [deletingProductId, setDeletingProductId] = React.useState(null);
+            const [productMessage, setProductMessage] = React.useState(null);
+            const [showCategoryForm, setShowCategoryForm] = React.useState(false);
+            const [categoryName, setCategoryName] = React.useState('');
+            const [categoryDescription, setCategoryDescription] = React.useState('');
+            const [categorySubmitting, setCategorySubmitting] = React.useState(false);
+            const [categoryMessage, setCategoryMessage] = React.useState(null);
+            const [deletingCategoryId, setDeletingCategoryId] = React.useState(null);
+            const [categories, setCategories] = React.useState([]);
+            const [categoriesLoading, setCategoriesLoading] = React.useState(true);
+            const [categoriesError, setCategoriesError] = React.useState(null);
+            const [showProductForm, setShowProductForm] = React.useState(false);
+            const [productFormCatId, setProductFormCatId] = React.useState(null);
+            const [newProductName, setNewProductName] = React.useState('');
+            const [newProductDescription, setNewProductDescription] = React.useState('');
+            const [productSubmitting, setProductSubmitting] = React.useState(false);
+            const [addProductMessage, setAddProductMessage] = React.useState(null);
+            const [uploadingImagesForId, setUploadingImagesForId] = React.useState(null);
+            const [imageIndexByProduct, setImageIndexByProduct] = React.useState({});
+            const [deletingImageId, setDeletingImageId] = React.useState(null);
+
+            const [authToken, setAuthToken] = React.useState(() => localStorage.getItem('authToken') || null);
+            const [authUsername, setAuthUsername] = React.useState(() => localStorage.getItem('authUsername') || null);
+            const [authRole, setAuthRole] = React.useState(() => localStorage.getItem('authRole') || null);
+            const [showLoginForm, setShowLoginForm] = React.useState(false);
+            const [loginUsername, setLoginUsername] = React.useState('');
+            const [loginPassword, setLoginPassword] = React.useState('');
+            const [loginSubmitting, setLoginSubmitting] = React.useState(false);
+            const [loginMessage, setLoginMessage] = React.useState(null);
+
+            const isLoggedIn = !!authToken;
+            const isAdmin = isLoggedIn && authRole === 'Admin';
+
+            const authHeaders = () => (authToken ? { 'Authorization': `Bearer ${authToken}` } : {});
+
+            const API_BASE = 'http://localhost:5055/api';
+            const CATEGORY_API_URL = 'http://localhost:5055/api/ProductCategories';
+
+            const loadCategories = async () => {
+                setCategoriesLoading(true);
+                setCategoriesError(null);
+
+                try {
+                    const response = await fetch(CATEGORY_API_URL);
+                    if (!response.ok) {
+                        throw new Error(`Request failed (${response.status})`);
+                    }
+
+                    const result = await response.json();
+                    const categoryList = Array.isArray(result) ? result : result.data;
+                    setCategories(Array.isArray(categoryList) ? categoryList : []);
+                } catch (err) {
+                    setCategoriesError(err.message);
+                    setCategories([]);
+                } finally {
+                    setCategoriesLoading(false);
+                }
+            };
+
+            React.useEffect(() => {
+                loadCategories();
+            }, []);
+
+            React.useEffect(() => {
+                const categoryId = activeTab === 'all' ? 0 : activeTab;
+                const url = `${API_BASE}/Products/by-category/${categoryId}`;
+
+                setLoading(true);
+                fetch(url)
+                    .then(res => { if (!res.ok) throw new Error('Failed to fetch products'); return res.json(); })
+                    .then(data => { setProducts(data); setLoading(false); })
+                    .catch(err => { setError(err.message); setLoading(false); });
+            }, [activeTab]);
+
+            const sendWhatsAppMessage = (productName) => {
+                const message = `Hi! I'm interested in enquiring about "${productName}". Could you please provide more details about this solution? Thank you!`;
+                const encodedMessage = encodeURIComponent(message);
+                const whatsappURL = `https://wa.me/254700708695?text=${encodedMessage}`;
+                window.open(whatsappURL, '_blank');
+            };
+
+            const login = async (event) => {
+                event.preventDefault();
+                if (!loginUsername.trim() || !loginPassword) {
+                    setLoginMessage({ type: 'error', text: 'Username and password are required.' });
+                    return;
+                }
+
+                setLoginSubmitting(true);
+                setLoginMessage(null);
+
+                try {
+                    const response = await fetch(`${API_BASE}/Auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: loginUsername.trim(), password: loginPassword })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(response.status === 401 ? 'Invalid username or password.' : `Request failed (${response.status})`);
+                    }
+
+                    const result = await response.json();
+                    setAuthToken(result.token);
+                    setAuthUsername(result.username);
+                    setAuthRole(result.role);
+                    localStorage.setItem('authToken', result.token);
+                    localStorage.setItem('authUsername', result.username);
+                    localStorage.setItem('authRole', result.role);
+
+                    setLoginPassword('');
+                    setShowLoginForm(false);
+                    setLoginMessage(null);
+                } catch (err) {
+                    setLoginMessage({ type: 'error', text: err.message });
+                } finally {
+                    setLoginSubmitting(false);
+                }
+            };
+
+            const logout = () => {
+                setAuthToken(null);
+                setAuthUsername(null);
+                setAuthRole(null);
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('authUsername');
+                localStorage.removeItem('authRole');
+            };
+
+            const addCategory = async (event) => {
+                event.preventDefault();
+                const trimmedName = categoryName.trim();
+
+                if (!trimmedName) {
+                    setCategoryMessage({ type: 'error', text: 'Category name is required.' });
+                    return;
+                }
+
+                setCategorySubmitting(true);
+                setCategoryMessage(null);
+
+                try {
+                    const response = await fetch(CATEGORY_API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                        body: JSON.stringify({
+                            catName: trimmedName,
+                            description: categoryDescription.trim()
+                        })
+                    });
+
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('You must be logged in as Admin to add a category.');
+                    }
+                    if (!response.ok) {
+                        throw new Error(`Request failed (${response.status})`);
+                    }
+
+                    setCategoryName('');
+                    setCategoryDescription('');
+                    setCategoryMessage({ type: 'success', text: 'Category added successfully.' });
+                    loadCategories();
+                } catch (err) {
+                    setCategoryMessage({ type: 'error', text: `Could not add category: ${err.message}` });
+                } finally {
+                    setCategorySubmitting(false);
+                }
+            };
+
+            const deleteCategory = async (categoryId, categoryValue) => {
+                if (!window.confirm(`Delete category "${categoryValue}"? This cannot be undone.`)) {
+                    return;
+                }
+
+                setCategoryMessage(null);
+                setDeletingCategoryId(categoryId);
+
+                try {
+                    const response = await fetch(`${CATEGORY_API_URL}/${categoryId}`, {
+                        method: 'DELETE',
+                        headers: { ...authHeaders() }
+                    });
+
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('You must be logged in as Admin to delete a category.');
+                    }
+                    if (!response.ok) {
+                        throw new Error(`Request failed (${response.status})`);
+                    }
+
+                    if (activeTab === categoryId) {
+                        setActiveTab('all');
+                    }
+
+                    setCategoryMessage({ type: 'success', text: `Category "${categoryValue}" deleted successfully.` });
+                    loadCategories();
+                } catch (err) {
+                    setCategoryMessage({ type: 'error', text: `Could not delete category: ${err.message}` });
+                } finally {
+                    setDeletingCategoryId(null);
+                }
+            };
+
+            const openProductForm = (catId) => {
+                setProductFormCatId(catId);
+                setShowProductForm(true);
+                setNewProductName('');
+                setNewProductDescription('');
+                setAddProductMessage(null);
+            };
+
+            const addProduct = async (event) => {
+                event.preventDefault();
+                const trimmedName = newProductName.trim();
+
+                if (!trimmedName) {
+                    setAddProductMessage({ type: 'error', text: 'Product name is required.' });
+                    return;
+                }
+
+                if (!productFormCatId) {
+                    setAddProductMessage({ type: 'error', text: 'Please select a category.' });
+                    return;
+                }
+
+                setProductSubmitting(true);
+                setAddProductMessage(null);
+
+                try {
+                    const response = await fetch(`${API_BASE}/Products`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                        body: JSON.stringify({
+                            productName: trimmedName,
+                            productDescription: newProductDescription.trim(),
+                            catId: productFormCatId
+                        })
+                    });
+
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('You must be logged in as Admin to add a product.');
+                    }
+                    if (!response.ok) {
+                        throw new Error(`Request failed (${response.status})`);
+                    }
+
+                    const createdProduct = await response.json();
+
+                    if (activeTab === 0 || activeTab === 'all' || activeTab === productFormCatId) {
+                        setProducts(prev => [...prev, createdProduct]);
+                    }
+
+                    setNewProductName('');
+                    setNewProductDescription('');
+                    setAddProductMessage({ type: 'success', text: 'Product added successfully.' });
+                } catch (err) {
+                    setAddProductMessage({ type: 'error', text: `Could not add product: ${err.message}` });
+                } finally {
+                    setProductSubmitting(false);
+                }
+            };
+
+            const uploadProductImages = async (productId, fileList) => {
+                if (!fileList || fileList.length === 0) return;
+
+                setUploadingImagesForId(productId);
+                setProductMessage(null);
+
+                try {
+                    const formData = new FormData();
+                    Array.from(fileList).forEach(file => formData.append('files', file));
+
+                    const response = await fetch(`${API_BASE}/Products/${productId}/upload-images`, {
+                        method: 'POST',
+                        headers: { ...authHeaders() },
+                        body: formData
+                    });
+
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('You must be logged in as Admin to upload images.');
+                    }
+                    if (!response.ok) {
+                        throw new Error(`Request failed (${response.status})`);
+                    }
+
+                    const updatedProduct = await response.json();
+
+                    setProducts(prev => prev.map(p => (
+                        (p.productId || p.id) === productId ? { ...p, productImages: updatedProduct.productImages } : p
+                    )));
+
+                    // Jump to the newly uploaded image(s) so the user sees the result immediately
+                    setImageIndexByProduct(prev => ({
+                        ...prev,
+                        [productId]: Math.max((updatedProduct.productImages || []).length - 1, 0)
+                    }));
+
+                    setProductMessage({ type: 'success', text: 'Image(s) uploaded successfully.' });
+                } catch (err) {
+                    setProductMessage({ type: 'error', text: `Could not upload image(s): ${err.message}` });
+                } finally {
+                    setUploadingImagesForId(null);
+                }
+            };
+
+            const changeProductImage = (productId, totalImages, direction) => {
+                setImageIndexByProduct(prev => {
+                    const current = prev[productId] || 0;
+                    const next = (current + direction + totalImages) % totalImages;
+                    return { ...prev, [productId]: next };
+                });
+            };
+
+            const deleteProductImage = async (productId, imageId) => {
+                if (!window.confirm('Delete this image? This cannot be undone.')) {
+                    return;
+                }
+
+                setDeletingImageId(imageId);
+                setProductMessage(null);
+
+                try {
+                    const response = await fetch(`${API_BASE}/Products/images/${imageId}`, {
+                        method: 'DELETE',
+                        headers: { ...authHeaders() }
+                    });
+
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('You must be logged in as Admin to delete images.');
+                    }
+                    if (!response.ok) {
+                        throw new Error(`Request failed (${response.status})`);
+                    }
+
+                    setProducts(prev => prev.map(p => {
+                        if ((p.productId || p.id) !== productId) return p;
+                        const remainingImages = (p.productImages || []).filter(img => (img.productImageId || img.id) !== imageId);
+                        return { ...p, productImages: remainingImages };
+                    }));
+
+                    setImageIndexByProduct(prev => ({ ...prev, [productId]: 0 }));
+                    setProductMessage({ type: 'success', text: 'Image deleted successfully.' });
+                } catch (err) {
+                    setProductMessage({ type: 'error', text: `Could not delete image: ${err.message}` });
+                } finally {
+                    setDeletingImageId(null);
+                }
+            };
+
+            const deleteProduct = async (productId, productName) => {
+                if (!window.confirm(`Delete product "${productName}"? This cannot be undone.`)) {
+                    return;
+                }
+
+                setProductMessage(null);
+                setDeletingProductId(productId);
+
+                try {
+                    const response = await fetch(`${API_BASE}/Products/${productId}`, {
+                        method: 'DELETE',
+                        headers: { ...authHeaders() }
+                    });
+
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('You must be logged in as Admin to delete products.');
+                    }
+                    if (!response.ok) {
+                        throw new Error(`Request failed (${response.status})`);
+                    }
+
+                    setProducts(prev => prev.filter(p => (p.productId || p.id) !== productId));
+                    setProductMessage({ type: 'success', text: `Product "${productName}" deleted successfully.` });
+                } catch (err) {
+                    setProductMessage({ type: 'error', text: `Could not delete product: ${err.message}` });
+                } finally {
+                    setDeletingProductId(null);
+                }
+            };
+
+            const services = [
+                { name: "TIMS", desc: "Certified tax devices and middleware" },
+                { name: "eTIMS", desc: "Software for invoicing and digital tax compliance" },
+                { name: "POS", desc: "Retail hardware for smooth daily transactions" },
+                { name: "IT", desc: "Networking, cabling, servers, and support" },
+                { name: "Security", desc: "CCTV systems with remote monitoring" }
+            ];
+
+            return (
+                <>
+                    <div className="splash-screen">
+                        <div className="splash-content">
+                            <div className="splash-logo">
+                                <img src="./logo.png" alt="OneSource Logo" style={{width: '100%', height: '100%', objectFit: 'contain', padding: '10px'}} />
+                            </div>
+                            <span className="splash-text">OneSource Solutions</span>
+                        </div>
+                    </div>
+
+                    <header>
+                        <nav>
+                            <div className="logo-brand">
+                                <div className="logo-icon">
+                                    <img src="./logo.png" alt="OneSource Logo" style={{width: '100%', height: '100%', objectFit: 'contain'}} />
+                                </div>
+                                <span className="logo">OneSource Solutions</span>
+                            </div>
+                            <ul>
+                                <li>
+                                    <div className="dropdown">
+                                        <button className="dropdown-button">
+                                            Products <span>▼</span>
+                                        </button>
+                                        <div className="dropdown-menu">
+                                            <a href="#products" onClick={() => setActiveTab('tims')}>TIMS</a>
+                                            <a href="#products" onClick={() => setActiveTab('etims')}>eTIMS</a>
+                                            <a href="#products" onClick={() => setActiveTab('pos')}>POS Hardware</a>
+                                            <a href="#products" onClick={() => setActiveTab('it')}>IT Hardware</a>
+                                            <a href="#products" onClick={() => setActiveTab('security')}>Security</a>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div className="dropdown">
+                                        <button className="dropdown-button">
+                                            Services <span>▼</span>
+                                        </button>
+                                        <div className="dropdown-menu">
+                                            <a href="#services">TIMS Solutions</a>
+                                            <a href="#services">eTIMS Software</a>
+                                            <a href="#services">POS Systems</a>
+                                            <a href="#services">IT Infrastructure</a>
+                                            <a href="#services">Security Systems</a>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div className="dropdown">
+                                        <button className="dropdown-button">
+                                            Contact <span>▼</span>
+                                        </button>
+                                        <div className="dropdown-menu">
+                                            <a href="mailto:info@onesourcesolutionske.com">📧 Email</a>
+                                            <a href="https://wa.me/254700708695" target="_blank" rel="noreferrer">📱 WhatsApp</a>
+                                            <a href="tel:+254207903190">☎️ Phone</a>
+                                            <a href="https://maps.google.com/?q=OneSource+Solutions+Kenya" target="_blank" rel="noreferrer">📍 Location</a>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div className="auth-controls" style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                {isLoggedIn ? (
+                                    <>
+                                        <span style={{ color: '#fff', fontSize: '0.85rem' }}>
+                                            👤 {authUsername} {authRole ? `(${authRole})` : ''}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            className="enquire-btn"
+                                            style={{ padding: '0.4rem 0.9rem', fontSize: '0.85rem' }}
+                                            onClick={logout}
+                                        >
+                                            Logout
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button
+                                            type="button"
+                                            className="enquire-btn"
+                                            style={{ padding: '0.4rem 0.9rem', fontSize: '0.85rem' }}
+                                            onClick={() => { setShowLoginForm((v) => !v); setLoginMessage(null); }}
+                                        >
+                                            Login
+                                        </button>
+                                        {showLoginForm && (
+                                            <form
+                                                onSubmit={login}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '110%',
+                                                    right: 0,
+                                                    background: 'white',
+                                                    padding: '1rem',
+                                                    borderRadius: '8px',
+                                                    boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                                                    minWidth: '220px',
+                                                    zIndex: 50,
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    gap: '0.6rem'
+                                                }}
+                                            >
+                                                <input
+                                                    type="text"
+                                                    placeholder="Username"
+                                                    value={loginUsername}
+                                                    onChange={(event) => setLoginUsername(event.target.value)}
+                                                    required
+                                                />
+                                                <input
+                                                    type="password"
+                                                    placeholder="Password"
+                                                    value={loginPassword}
+                                                    onChange={(event) => setLoginPassword(event.target.value)}
+                                                    required
+                                                />
+                                                <button type="submit" className="enquire-btn" disabled={loginSubmitting}>
+                                                    {loginSubmitting ? 'Logging in...' : 'Login'}
+                                                </button>
+                                                {loginMessage && (
+                                                    <p className={`category-form-message ${loginMessage.type}`} role="status" style={{ margin: 0 }}>
+                                                        {loginMessage.text}
+                                                    </p>
+                                                )}
+                                            </form>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                        </nav>
+                    </header>
+
+                    <section className="hero">
+                        <div className="hero-content">
+                            <div className="hero-copy">
+                                <span className="eyebrow">Trusted ICT Partner in Kenya</span>
+                                <h1>Empowering You with the Latest in IT &amp; Technology</h1>
+                                <p>Onesource Solutions Limited is an ICT company providing customized hardware and software solutions to enable vital business processes across varied sectors. As KRA authorized suppliers of Electronic Fiscal Devices, and providers of hospitality, payroll, networking, and CCTV solutions — we're your complete technology partner in Nairobi.</p>
+                                <div className="hero-actions">
+                                    <a href="#products" className="cta-button">View Our Products</a>
+                                    <a href="#contact" className="cta-button secondary">Get In Touch</a>
+                                </div>
+                                <div className="badges hero-badges">
+                                    <span className="badge">✓ 24/7 Support</span>
+                                    <span className="badge">✓ KRA Licensed</span>
+                                    <span className="badge">✓ Certified Solutions</span>
+                                </div>
+                            </div>
+
+                            <div className="hero-panel">
+                                <div className="panel-header">
+                                    <span className="panel-pill">Business Ready</span>
+                                    <span className="panel-dot" aria-label="Online" />
+                                </div>
+                                <div className="panel-metric">24/7</div>
+                                <p className="panel-subtitle">Support for retail, hospitality, healthcare, pharmacies, and large corporate environments.</p>
+                                <ul className="panel-list">
+                                    <li>TIMS & eTIMS setup</li>
+                                    <li>POS and ERP integration</li>
+                                    <li>Networking and CCTV support</li>
+                                </ul>
+                                <div className="mini-grid">
+                                    <div className="mini-card">
+                                        <strong>98%</strong>
+                                        <span>Retention</span>
+                                    </div>
+                                    <div className="mini-card">
+                                        <strong>10+</strong>
+                                        <span>Industries</span>
+                                    </div>
+                                    <div className="mini-card">
+                                        <strong>KRA</strong>
+                                        <span>Licensed</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="section">
+                        <div className="container">
+                            <h2 className="section-title">Why Choose OneSource Solutions?</h2>
+                            <div className="features">
+                                <div className="feature-card">
+                                    <div className="feature-icon">🚀</div>
+                                    <h3>Fast Implementation</h3>
+                                    <p>Quick deployment and setup tailored to your business needs</p>
+                                </div>
+                                <div className="feature-card">
+                                    <div className="feature-icon">🔒</div>
+                                    <h3>Secure & Compliant</h3>
+                                    <p>KRA licensed solutions meeting all regulatory requirements</p>
+                                </div>
+                                <div className="feature-card">
+                                    <div className="feature-icon">🤝</div>
+                                    <h3>Expert Support</h3>
+                                    <p>24/7 customer support and technical assistance</p>
+                                </div>
+                                <div className="feature-card">
+                                    <div className="feature-icon">🏢</div>
+                                    <h3>Business Focused</h3>
+                                    <p>Solutions designed specifically for East African businesses</p>
+                                </div>
+                                <div className="feature-card">
+                                    <div className="feature-icon">🔄</div>
+                                    <h3>Seamless Integration</h3>
+                                    <p>Works with existing systems and infrastructure</p>
+                                </div>
+                                <div className="feature-card">
+                                    <div className="feature-icon">📊</div>
+                                    <h3>Growth Ready</h3>
+                                    <p>Scalable solutions that grow with your business</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="services" className="section">
+                        <div className="container">
+                            <h2 className="section-title">Our Core Services</h2>
+                            <div className="service-grid">
+                                {services.map((service, idx) => (
+                                    <div key={idx} className="service-card">
+                                        <span className="service-tag">{service.name}</span>
+                                        <h3>{service.name}</h3>
+                                        <p>{service.desc}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="products" className="products-section section">
+                        <div className="container">
+                            <h2 className="section-title">Featured Products</h2>
+
+                            {isAdmin && (
+                            <div className="category-form">
+                                <button
+                                    type="button"
+                                    className="enquire-btn"
+                                    onClick={() => {
+                                        setShowCategoryForm((isVisible) => !isVisible);
+                                        setCategoryMessage(null);
+                                    }}
+                                >
+                                    {showCategoryForm ? 'Close Category Form' : '+ Add Category'}
+                                </button>
+
+                                {showCategoryForm && (
+                                    <form onSubmit={addCategory} style={{marginTop: '1rem'}}>
+                                        <div className="category-form-fields">
+                                            <label>
+                                                Category name
+                                                <input
+                                                    type="text"
+                                                    value={categoryName}
+                                                    onChange={(event) => setCategoryName(event.target.value)}
+                                                    placeholder="e.g. Networking"
+                                                    required
+                                                />
+                                            </label>
+                                            <label>
+                                                Description (optional)
+                                                <input
+                                                    type="text"
+                                                    value={categoryDescription}
+                                                    onChange={(event) => setCategoryDescription(event.target.value)}
+                                                    placeholder="Add a short description"
+                                                />
+                                            </label>
+                                            <button type="submit" className="enquire-btn" disabled={categorySubmitting}>
+                                                {categorySubmitting ? 'Adding...' : 'Save Category'}
+                                            </button>
+                                        </div>
+                                        {categoryMessage && (
+                                            <p className={`category-form-message ${categoryMessage.type}`} role="status">
+                                                {categoryMessage.text}
+                                            </p>
+                                        )}
+                                    </form>
+                                )}
+                            </div>
+                            )}
+
+                            {isAdmin && showProductForm && (
+                                <div className="category-form" style={{marginBottom: '1.5rem'}}>
+                                    <form onSubmit={addProduct}>
+                                        <div className="category-form-fields">
+                                            <label>
+                                                Category
+                                                <select
+                                                    value={productFormCatId || ''}
+                                                    onChange={(event) => setProductFormCatId(Number(event.target.value))}
+                                                    required
+                                                >
+                                                    <option value="" disabled>Select a category</option>
+                                                    {categories.map((category, index) => {
+                                                        const categoryValue = category.catName || category.name || category.categoryName;
+                                                        const categoryId = category.cateId || category.id || category.categoryId || category.catId || index;
+                                                        return (
+                                                            <option key={categoryId} value={categoryId}>{categoryValue}</option>
+                                                        );
+                                                    })}
+                                                </select>
+                                            </label>
+                                            <label>
+                                                Product name
+                                                <input
+                                                    type="text"
+                                                    value={newProductName}
+                                                    onChange={(event) => setNewProductName(event.target.value)}
+                                                    placeholder="e.g. Ace Control Unit"
+                                                    required
+                                                />
+                                            </label>
+                                            <label>
+                                                Description (optional)
+                                                <input
+                                                    type="text"
+                                                    value={newProductDescription}
+                                                    onChange={(event) => setNewProductDescription(event.target.value)}
+                                                    placeholder="Add a short description"
+                                                />
+                                            </label>
+                                            <button type="submit" className="enquire-btn" disabled={productSubmitting}>
+                                                {productSubmitting ? 'Adding...' : 'Save Product'}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="enquire-btn"
+                                                style={{background: '#64748b'}}
+                                                onClick={() => setShowProductForm(false)}
+                                            >
+                                                Close
+                                            </button>
+                                        </div>
+                                        {addProductMessage && (
+                                            <p className={`category-form-message ${addProductMessage.type}`} role="status">
+                                                {addProductMessage.text}
+                                            </p>
+                                        )}
+                                    </form>
+                                </div>
+                            )}
+
+                            <div style={{textAlign: 'center', marginBottom: '2rem'}}>
+                                <button
+                                    onClick={() => setActiveTab('all')}
+                                    style={{
+                                        padding: '0.7rem 1.5rem',
+                                        margin: '0 0.3rem',
+                                        border: 'none',
+                                        borderRadius: '5px',
+                                        cursor: 'pointer',
+                                        background: activeTab === 'all' ? '#1e40af' : '#ddd',
+                                        color: activeTab === 'all' ? 'white' : '#333',
+                                        fontWeight: 600
+                                    }}
+                                >
+                                    All Products
+                                </button>
+                                {categoriesLoading && <span style={{padding: '0.7rem', color: '#475569'}}>Loading categories...</span>}
+                                {!categoriesLoading && categories.map((category, index) => {
+                                    const categoryValue = category.catName || category.name || category.categoryName;
+                                    const categoryId = category.cateId || category.id || category.categoryId || category.catId || categoryValue || index;
+
+                                    if (!categoryValue) return null;
+
+                                    return (
+                                        <span key={categoryId} style={{ position: 'relative', display: 'inline-block', margin: '0 0.3rem 0.8rem' }}>
+                                            <button
+                                                onClick={() => setActiveTab(categoryId)}
+                                                style={{
+                                                    padding: '0.7rem 2rem 0.7rem 1.5rem',
+                                                    border: 'none',
+                                                    borderRadius: '5px',
+                                                    cursor: 'pointer',
+                                                    background: activeTab === categoryId ? '#1e40af' : '#ddd',
+                                                    color: activeTab === categoryId ? 'white' : '#333',
+                                                    fontWeight: 600
+                                                }}
+                                            >
+                                                {categoryValue}
+                                            </button>
+                                            {isAdmin && (
+                                            <button
+                                                type="button"
+                                                title={`Delete ${categoryValue}`}
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    deleteCategory(categoryId, categoryValue);
+                                                }}
+                                                disabled={deletingCategoryId === categoryId}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '2px',
+                                                    right: '4px',
+                                                    width: '18px',
+                                                    height: '18px',
+                                                    lineHeight: '16px',
+                                                    padding: 0,
+                                                    border: 'none',
+                                                    borderRadius: '50%',
+                                                    cursor: deletingCategoryId === categoryId ? 'not-allowed' : 'pointer',
+                                                    background: '#dc2626',
+                                                    color: 'white',
+                                                    fontSize: '0.7rem',
+                                                    fontWeight: 700,
+                                                    opacity: deletingCategoryId === categoryId ? 0.6 : 1
+                                                }}
+                                            >
+                                                {deletingCategoryId === categoryId ? '…' : '×'}
+                                            </button>
+                                            )}
+                                            {isAdmin && (
+                                            <button
+                                                type="button"
+                                                title={`Add product to ${categoryValue}`}
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    openProductForm(categoryId);
+                                                }}
+                                                style={{
+                                                    position: 'absolute',
+                                                    bottom: '-10px',
+                                                    left: '50%',
+                                                    transform: 'translateX(-50%)',
+                                                    width: '20px',
+                                                    height: '20px',
+                                                    lineHeight: '18px',
+                                                    padding: 0,
+                                                    border: 'none',
+                                                    borderRadius: '50%',
+                                                    cursor: 'pointer',
+                                                    background: '#16a34a',
+                                                    color: 'white',
+                                                    fontSize: '0.8rem',
+                                                    fontWeight: 700
+                                                }}
+                                            >
+                                                +
+                                            </button>
+                                            )}
+                                        </span>
+                                    );
+                                })}
+                                {categoriesError && <span style={{display: 'block', width: '100%', color: '#dc2626', marginTop: '0.75rem'}}>Could not load categories: {categoriesError}</span>}
+                            </div>
+
+                            <div className="product-grid">
+                                {loading && (
+                                    <p style={{gridColumn: '1/-1', textAlign: 'center', color: '#475569', padding: '3rem'}}>Loading products...</p>
+                                )}
+                                {error && (
+                                    <p style={{gridColumn: '1/-1', textAlign: 'center', color: '#dc2626', padding: '3rem'}}>⚠️ Could not load products. Please ensure the API is running.<br/><small>{error}</small></p>
+                                )}
+                                {!loading && !error && products.length === 0 && (
+                                    <p style={{gridColumn: '1/-1', textAlign: 'center', color: '#475569', padding: '3rem'}}>No products found in this category.</p>
+                                )}
+                                {productMessage && (
+                                    <p style={{gridColumn: '1/-1', textAlign: 'center', color: productMessage.type === 'error' ? '#dc2626' : '#16a34a', fontWeight: 600}}>
+                                        {productMessage.text}
+                                    </p>
+                                )}
+                                {!loading && !error && products.map((product) => {
+                                    const productId = product.productId || product.id;
+                                    const productName = product.productName || product.name || 'Untitled Product';
+                                    const productDescription = product.productDescription || product.description || '';
+                                    const images = Array.isArray(product.productImages) ? product.productImages : [];
+                                    const currentImageIndex = images.length > 0
+                                        ? Math.min(imageIndexByProduct[productId] || 0, images.length - 1)
+                                        : 0;
+                                    const currentImage = images.length > 0 ? images[currentImageIndex] : null;
+                                    const currentImageId = currentImage ? (currentImage.productImageId || currentImage.id) : null;
+                                    const rawImageUrl = currentImage ? (currentImage.imageUrl || currentImage.url) : null;
+                                    const primaryImage = rawImageUrl
+                                        ? (rawImageUrl.startsWith('http') ? rawImageUrl : `http://localhost:5055${rawImageUrl}`)
+                                        : null;
+
+                                    return (
+                                        <div key={productId} className="product-card" style={{ position: 'relative' }}>
+                                            {isAdmin && (
+                                            <button
+                                                type="button"
+                                                title={`Delete ${productName}`}
+                                                onClick={() => deleteProduct(productId, productName)}
+                                                disabled={deletingProductId === productId}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '8px',
+                                                    right: '8px',
+                                                    width: '26px',
+                                                    height: '26px',
+                                                    lineHeight: '24px',
+                                                    padding: 0,
+                                                    border: 'none',
+                                                    borderRadius: '50%',
+                                                    cursor: deletingProductId === productId ? 'not-allowed' : 'pointer',
+                                                    background: '#dc2626',
+                                                    color: 'white',
+                                                    fontSize: '0.9rem',
+                                                    fontWeight: 700,
+                                                    opacity: deletingProductId === productId ? 0.6 : 1,
+                                                    zIndex: 2
+                                                }}
+                                            >
+                                                {deletingProductId === productId ? '…' : '×'}
+                                            </button>
+                                            )}
+                                            {primaryImage ? (
+                                                <div style={{ position: 'relative' }}>
+                                                    <img src={primaryImage} alt={productName} />
+                                                    {images.length > 1 && (
+                                                        <>
+                                                            <button
+                                                                type="button"
+                                                                title="Previous image"
+                                                                onClick={() => changeProductImage(productId, images.length, -1)}
+                                                                style={{
+                                                                    position: 'absolute',
+                                                                    top: '50%',
+                                                                    left: '6px',
+                                                                    transform: 'translateY(-50%)',
+                                                                    width: '28px',
+                                                                    height: '28px',
+                                                                    borderRadius: '50%',
+                                                                    border: 'none',
+                                                                    cursor: 'pointer',
+                                                                    background: 'rgba(0,0,0,0.5)',
+                                                                    color: 'white',
+                                                                    fontSize: '1rem',
+                                                                    lineHeight: '28px',
+                                                                    padding: 0
+                                                                }}
+                                                            >
+                                                                ‹
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                title="Next image"
+                                                                onClick={() => changeProductImage(productId, images.length, 1)}
+                                                                style={{
+                                                                    position: 'absolute',
+                                                                    top: '50%',
+                                                                    right: '6px',
+                                                                    transform: 'translateY(-50%)',
+                                                                    width: '28px',
+                                                                    height: '28px',
+                                                                    borderRadius: '50%',
+                                                                    border: 'none',
+                                                                    cursor: 'pointer',
+                                                                    background: 'rgba(0,0,0,0.5)',
+                                                                    color: 'white',
+                                                                    fontSize: '1rem',
+                                                                    lineHeight: '28px',
+                                                                    padding: 0
+                                                                }}
+                                                            >
+                                                                ›
+                                                            </button>
+                                                            <span style={{
+                                                                position: 'absolute',
+                                                                bottom: '6px',
+                                                                left: '50%',
+                                                                transform: 'translateX(-50%)',
+                                                                background: 'rgba(0,0,0,0.5)',
+                                                                color: 'white',
+                                                                fontSize: '0.7rem',
+                                                                padding: '2px 8px',
+                                                                borderRadius: '10px'
+                                                            }}>
+                                                                {currentImageIndex + 1} / {images.length}
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                    {isAdmin && (
+                                                    <button
+                                                        type="button"
+                                                        title="Delete this image"
+                                                        disabled={deletingImageId === currentImageId}
+                                                        onClick={() => deleteProductImage(productId, currentImageId)}
+                                                        style={{
+                                                            position: 'absolute',
+                                                            top: '6px',
+                                                            left: '6px',
+                                                            width: '22px',
+                                                            height: '22px',
+                                                            lineHeight: '20px',
+                                                            borderRadius: '50%',
+                                                            border: 'none',
+                                                            cursor: deletingImageId === currentImageId ? 'not-allowed' : 'pointer',
+                                                            background: '#dc2626',
+                                                            color: 'white',
+                                                            fontSize: '0.75rem',
+                                                            fontWeight: 700,
+                                                            padding: 0,
+                                                            opacity: deletingImageId === currentImageId ? 0.6 : 1
+                                                        }}
+                                                    >
+                                                        {deletingImageId === currentImageId ? '…' : '🗑'}
+                                                    </button>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <div style={{background: '#1e40af', color: 'white', fontSize: '3rem', padding: '2rem', textAlign: 'center'}}>
+                                                    📦
+                                                </div>
+                                            )}
+                                            <div className="product-body">
+                                                <h3>{productName}</h3>
+                                                {productDescription && <p>{productDescription}</p>}
+                                                {isAdmin && (
+                                                <label style={{ display: 'block', fontSize: '0.75rem', color: '#475569', marginBottom: '0.5rem', cursor: 'pointer' }}>
+                                                    {uploadingImagesForId === productId ? 'Uploading...' : '📤 Upload image(s)'}
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        multiple
+                                                        disabled={uploadingImagesForId === productId}
+                                                        onChange={(event) => {
+                                                            uploadProductImages(productId, event.target.files);
+                                                            event.target.value = '';
+                                                        }}
+                                                        style={{ display: 'none' }}
+                                                    />
+                                                </label>
+                                                )}
+                                                <button
+                                                    className="enquire-btn"
+                                                    onClick={() => sendWhatsAppMessage(productName)}
+                                                >
+                                                    Enquire Now
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="section">
+                        <div className="container">
+                            <h2 className="section-title">Trusted by Leading Companies</h2>
+                            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem', marginTop: '2rem'}}>
+                                {[
+                                    'Total Energies Limited',
+                                    'Kenya Ports Authority',
+                                    'Kenafric Industries Limited',
+                                    'Tropical Heat Limited',
+                                    'Hotpoint Limited',
+                                    'Healthy U Ltd',
+                                    'Roche Kenya Ltd',
+                                    'Ramco Group of Companies',
+                                    'Simbisa Brands Kenya Limited',
+                                    'Good Life Pharmacy',
+                                    'Airtel Kenya Limited',
+                                    'Auto Xpress Limited',
+                                    'Mastermind Tobacco Limited',
+                                    'Black Tulip Group of Companies',
+                                    'Kingsway Tyres Limited',
+                                    'CFAO Kenya Ltd (Toyota)',
+                                    'PKF Kenya Limited',
+                                    'Kenya Revenue Authority',
+                                    'Dalbit Petroleum Limited'
+                                ].map((client, idx) => (
+                                    <div key={idx} style={{background: 'white', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '1rem 1.2rem', display: 'flex', alignItems: 'center', gap: '0.6rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', fontWeight: 600, color: '#1e40af', fontSize: '0.9rem'}}>
+                                        <span style={{color: '#ea580c', fontWeight: 800}}>✓</span>
+                                        {client}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="contact" className="container">
+                        <div className="contact-section">
+                            <h2>Get In Touch With Us</h2>
+                            <p>Whether you're purchasing for personal use or your business, we're here to help you choose the right products and solutions.</p>
+
+                            <div className="contact-info">
+                                <a href="mailto:info@onesourcesolutionske.com" className="contact-card">
+                                    <strong>📧 Email</strong>
+                                    <span>info@onesourcesolutionske.com</span>
+                                </a>
+
+                                <a href="https://wa.me/254700708695" target="_blank" rel="noreferrer" className="contact-card">
+                                    <strong>📱 WhatsApp</strong>
+                                    <span>+254 700 708695</span>
+                                </a>
+
+                                <a href="tel:+254207903190" className="contact-card">
+                                    <strong>☎️ Phone</strong>
+                                    <span>020 7903190 / 0700 708695</span>
+                                </a>
+
+                                <a href="https://maps.google.com/?q=TRV+Centre+Building+3rd+Avenue+Parklands+Nairobi" target="_blank" rel="noreferrer" className="contact-card">
+                                    <strong>📍 Location</strong>
+                                    <span>Office No 7E, 7th Floor, TRV Centre Building, 3rd Avenue Parklands, Nairobi</span>
+                                </a>
+
+                                <div className="contact-card">
+                                    <strong>📮 Postal Address</strong>
+                                    <span>P.O. Box 221 – 00623, Nairobi, Kenya</span>
+                                </div>
+
+                                <a href="https://www.onesourcesolutionske.com" target="_blank" rel="noreferrer" className="contact-card">
+                                    <strong>🌐 Website</strong>
+                                    <span>www.onesourcesolutionske.com</span>
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+
+                    <footer>
+                        <p>&copy; 2025 OneSource Solutions Limited. All rights reserved.</p>
+                        <p style={{marginTop: '1rem', fontSize: '0.9rem'}}>
+                            <a href="mailto:info@onesourcesolutionske.com">Contact</a>
+                            <a href="https://wa.me/254700708695">WhatsApp</a>
+                            <a href="tel:+254207903190">Phone</a>
+                        </p>
+                        <p style={{marginTop: '1rem', fontSize: '0.8rem', opacity: 0.7}}>
+                            ICT Solutions for Business Growth • KRA Licensed • 24/7 Support
+                        </p>
+                    </footer>
+                </>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<SalesPage />);
+    </script>
+</body>
+</html>
