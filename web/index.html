@@ -9,19 +9,20 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         :root {
-            --bg: #f4f7ff;
+            --bg: #f7f8fa;
             --surface: #ffffff;
             --surface-soft: #f8fafc;
-            --primary: #0f172a;
-            --primary-strong: #1d4ed8;
-            --primary-soft: #dbeafe;
+            --primary: #20252b;
+            --primary-strong: var(--brand-blue);
+            --brand-blue: #83cdf7;
+            --primary-soft: var(--brand-blue);
             --accent: #f97316;
             --accent-soft: #fff1e9;
-            --text: #0f172a;
-            --muted: #475569;
-            --line: rgba(15, 23, 42, 0.08);
-            --shadow: 0 18px 50px rgba(15, 23, 42, 0.12);
-            --shadow-soft: 0 12px 30px rgba(15, 23, 42, 0.08);
+            --text: #20252b;
+            --muted: #6b7280;
+            --line: rgba(32, 37, 43, 0.08);
+            --shadow: 0 18px 50px rgba(32, 37, 43, 0.12);
+            --shadow-soft: 0 12px 30px rgba(32, 37, 43, 0.08);
             --radius-xl: 28px;
             --radius-lg: 22px;
             --radius-md: 16px;
@@ -41,12 +42,12 @@
             font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.6;
             color: var(--text);
-            background: linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
+            background: linear-gradient(180deg, #ffffff 0%, #f7f8fa 100%);
         }
 
         header {
-            background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%);
-            color: white;
+            background: var(--brand-blue);
+            color: var(--text);
             padding: 1rem 0;
             position: sticky;
             top: 0;
@@ -75,7 +76,7 @@
         }
 
         nav a {
-            color: white;
+            color: var(--text);
             text-decoration: none;
             font-weight: 500;
             transition: opacity 0.3s;
@@ -93,7 +94,7 @@
         .dropdown-button {
             background: none;
             border: none;
-            color: white;
+            color: var(--text);
             font-weight: 500;
             cursor: pointer;
             display: flex;
@@ -150,7 +151,7 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background: rgba(30, 64, 175, 0.1);
+            background: rgba(29, 78, 216, 0.1);
             transition: left 0.3s ease;
             z-index: -1;
         }
@@ -168,19 +169,17 @@
         }
 
         .dropdown-menu a:hover {
-            background: #1e40af;
-            color: white !important;
+            background: var(--brand-blue);
+            color: var(--text) !important;
             padding-left: 1.5rem;
             transform: translateX(3px);
         }
 
         .hero {
             position: relative;
-            color: white;
+            color: var(--text);
             padding: 5.5rem 2rem 4.5rem;
-            background: radial-gradient(circle at top left, rgba(96, 165, 250, 0.3), transparent 30%),
-                        radial-gradient(circle at bottom right, rgba(249, 115, 22, 0.24), transparent 25%),
-                        linear-gradient(135deg, #0f172a 0%, #111f52 38%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #c3e8fc 0%, var(--brand-blue) 45%, #5bb5f0 100%);
             overflow: hidden;
         }
 
@@ -191,7 +190,7 @@
             width: 420px;
             height: 420px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.08);
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.05) 70%);
             filter: blur(10px);
         }
 
@@ -203,7 +202,7 @@
             width: 380px;
             height: 380px;
             border-radius: 50%;
-            background: rgba(249, 115, 22, 0.12);
+            background: radial-gradient(circle at 40% 40%, rgba(249, 115, 22, 0.22), rgba(249, 115, 22, 0.04) 70%);
             filter: blur(20px);
         }
 
@@ -232,9 +231,9 @@
             text-transform: uppercase;
             letter-spacing: 0.12em;
             font-weight: 700;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            color: #e2e8f0;
+            background: rgba(32, 37, 43, 0.06);
+            border: 1px solid rgba(32, 37, 43, 0.14);
+            color: rgba(32, 37, 43, 0.85);
             margin-bottom: 1rem;
         }
 
@@ -244,7 +243,7 @@
             margin-bottom: 1.2rem;
             letter-spacing: -0.06em;
             max-width: 680px;
-            text-shadow: 0 18px 30px rgba(0, 0, 0, 0.18);
+            text-shadow: none;
         }
 
         .hero p {
@@ -286,22 +285,22 @@
         }
 
         .cta-button.secondary {
-            background: rgba(255, 255, 255, 0.06);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(32, 37, 43, 0.06);
+            color: var(--text);
+            border: 1px solid rgba(32, 37, 43, 0.22);
             box-shadow: none;
         }
 
         .cta-button.secondary:hover {
-            background: rgba(255, 255, 255, 0.14);
+            background: rgba(32, 37, 43, 0.12);
         }
 
         .hero-panel {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: linear-gradient(160deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.42) 100%);
+            border: 1px solid rgba(32, 37, 43, 0.12);
             border-radius: var(--radius-xl);
             padding: 1.5rem;
-            box-shadow: 0 30px 60px rgba(15, 23, 42, 0.2);
+            box-shadow: var(--shadow);
             backdrop-filter: blur(18px);
         }
 
@@ -317,13 +316,13 @@
             align-items: center;
             gap: 0.5rem;
             font-size: 0.76rem;
-            color: #dfe9ff;
+            color: var(--text);
             text-transform: uppercase;
             letter-spacing: 0.12em;
             padding: 0.5rem 0.7rem;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(32, 37, 43, 0.06);
+            border: 1px solid rgba(32, 37, 43, 0.1);
         }
 
         .panel-dot {
@@ -338,12 +337,12 @@
             font-size: 2.4rem;
             font-weight: 800;
             letter-spacing: -0.06em;
-            color: white;
+            color: var(--text);
             margin-bottom: 0.5rem;
         }
 
         .panel-subtitle {
-            color: rgba(255, 255, 255, 0.82);
+            color: rgba(32, 37, 43, 0.72);
             font-size: 0.98rem;
             margin-bottom: 1.2rem;
         }
@@ -360,7 +359,7 @@
             align-items: center;
             gap: 0.7rem;
             font-size: 0.95rem;
-            color: white;
+            color: var(--text);
         }
 
         .panel-list li::before {
@@ -370,8 +369,8 @@
             justify-content: center;
             width: 20px;
             height: 20px;
-            background: rgba(52, 211, 153, 0.2);
-            color: #a7f3d0;
+            background: rgba(52, 211, 153, 0.25);
+            color: #0f7a52;
             border-radius: 50%;
             font-weight: 800;
         }
@@ -383,8 +382,8 @@
         }
 
         .mini-card {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(32, 37, 43, 0.05);
+            border: 1px solid rgba(32, 37, 43, 0.1);
             border-radius: 14px;
             padding: 0.85rem 0.7rem;
             text-align: center;
@@ -393,12 +392,12 @@
         .mini-card strong {
             display: block;
             font-size: 1.15rem;
-            color: white;
+            color: var(--text);
         }
 
         .mini-card span {
             font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(32, 37, 43, 0.6);
             letter-spacing: 0.08em;
             text-transform: uppercase;
         }
@@ -417,7 +416,7 @@
             font-size: 2.5rem;
             text-align: center;
             margin-bottom: 3rem;
-            color: #1e40af;
+            color: var(--text);
             animation: slideUp 0.6s ease;
             position: relative;
             display: inline-block;
@@ -432,7 +431,7 @@
             transform: translateX(-50%);
             width: 60px;
             height: 4px;
-            background: linear-gradient(90deg, #1e40af, #ea580c);
+            background: linear-gradient(90deg, var(--brand-blue), #ea580c);
             border-radius: 2px;
             animation: slideInRight 0.8s ease 0.3s backwards;
         }
@@ -449,14 +448,14 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.12);
-            color: white;
+            background: rgba(32, 37, 43, 0.08);
+            color: var(--text);
             padding: 0.7rem 1rem;
             border-radius: 999px;
             font-weight: 600;
             font-size: 0.9rem;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+            border: 1px solid rgba(32, 37, 43, 0.14);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
             animation: scaleIn 0.6s ease both;
             transition: all 0.3s;
         }
@@ -487,7 +486,7 @@
             background: #f8f9fa;
             transition: transform 0.3s, box-shadow 0.3s;
             text-align: center;
-            border-left: 5px solid #1e40af;
+            border-left: 5px solid var(--brand-blue);
             animation: slideInUp 0.6s ease both;
         }
 
@@ -500,7 +499,7 @@
 
         .feature-card:hover {
             transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15), 0 0 20px rgba(30, 64, 175, 0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15), 0 0 20px rgba(29, 78, 216, 0.3);
             border-left-color: #ea580c;
             animation: none;
         }
@@ -519,7 +518,7 @@
         .feature-card h3 {
             font-size: 1.3rem;
             margin-bottom: 0.5rem;
-            color: #1e40af;
+            color: var(--text);
         }
 
         .service-grid {
@@ -547,13 +546,13 @@
         .service-card:hover {
             box-shadow: 0 5px 20px rgba(0,0,0,0.12);
             transform: translateY(-8px) rotateY(2deg);
-            border-top-color: #1e40af;
+            border-top-color: var(--brand-blue);
             background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
         }
 
         .service-tag {
             display: inline-block;
-            background: #1e40af;
+            background: var(--brand-blue);
             color: white;
             padding: 0.4rem 0.8rem;
             border-radius: 4px;
@@ -569,13 +568,13 @@
         }
 
         .service-card h3 {
-            color: #333;
+            color: var(--text);
             margin-bottom: 0.5rem;
             font-size: 1.1rem;
         }
 
         .service-card p {
-            color: #666;
+            color: var(--muted);
             font-size: 0.95rem;
         }
 
@@ -627,13 +626,13 @@
         }
 
         .product-body h3 {
-            color: #1e40af;
+            color: var(--text);
             margin-bottom: 0.5rem;
             font-size: 1.2rem;
         }
 
         .product-body p {
-            color: #666;
+            color: var(--muted);
             margin-bottom: 1rem;
             font-size: 0.95rem;
             line-height: 1.5;
@@ -644,7 +643,7 @@
             margin: 0 auto 2rem;
             padding: 1.25rem;
             background: white;
-            border: 1px solid #dbe4f0;
+            border: 1px solid #e5e7eb;
             border-radius: 10px;
             box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
         }
@@ -660,7 +659,7 @@
             display: flex;
             flex-direction: column;
             gap: 0.35rem;
-            color: #334155;
+            color: #374151;
             font-size: 0.85rem;
             font-weight: 600;
             text-align: left;
@@ -670,16 +669,16 @@
         .category-form select {
             width: 100%;
             padding: 0.7rem 0.8rem;
-            border: 1px solid #cbd5e1;
+            border: 1px solid #d1d5db;
             border-radius: 6px;
-            color: #1e293b;
+            color: #20252b;
             font: inherit;
         }
 
         .category-form input:focus,
         .category-form select:focus {
-            outline: 2px solid rgba(30, 64, 175, 0.25);
-            border-color: #1e40af;
+            outline: 2px solid rgba(29, 78, 216, 0.25);
+            border-color: var(--brand-blue);
         }
 
         .category-form-message {
@@ -743,8 +742,8 @@
         }
 
         .contact-section {
-            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
-            color: white;
+            background: linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-blue) 100%);
+            color: var(--text);
             padding: 4rem 2rem;
             border-radius: 10px;
             margin: 3rem 0;
@@ -763,12 +762,12 @@
         }
 
         .contact-card {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.55);
             padding: 1.5rem;
             border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(32, 37, 43, 0.16);
             text-decoration: none;
-            color: white;
+            color: var(--text);
             transition: all 0.3s;
             animation: slideUp 0.6s ease both;
             backdrop-filter: blur(10px);
@@ -780,10 +779,10 @@
         .contact-card:nth-child(4) { animation-delay: 0.4s; }
 
         .contact-card:hover {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.75);
             transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3), inset 0 0 20px rgba(255,255,255,0.1);
-            border-color: rgba(255,255,255,0.4);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.18), inset 0 0 20px rgba(255,255,255,0.2);
+            border-color: rgba(32, 37, 43, 0.3);
         }
 
         .contact-card strong {
@@ -800,12 +799,12 @@
         .contact-card span {
             display: block;
             font-size: 0.95rem;
-            opacity: 0.9;
+            color: rgba(32, 37, 43, 0.75);
             transition: all 0.3s;
         }
 
         .contact-card:hover span {
-            opacity: 1;
+            color: var(--text);
             transform: translateX(3px);
         }
 
@@ -819,7 +818,7 @@
 
         .badge {
             background: white;
-            color: #1e40af;
+            color: var(--text);
             padding: 0.5rem 1rem;
             border-radius: 20px;
             font-weight: 600;
@@ -851,7 +850,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+            background: linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-blue) 100%);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -896,7 +895,7 @@
         .splash-text {
             font-size: 2.5rem;
             font-weight: bold;
-            color: white;
+            color: var(--text);
             animation: slideUp 0.8s ease;
         }
 
@@ -1003,10 +1002,10 @@
 
         @keyframes glow {
             0%, 100% {
-                box-shadow: 0 0 5px rgba(30, 64, 175, 0.3);
+                box-shadow: 0 0 5px rgba(29, 78, 216, 0.3);
             }
             50% {
-                box-shadow: 0 0 20px rgba(30, 64, 175, 0.6);
+                box-shadow: 0 0 20px rgba(29, 78, 216, 0.6);
             }
         }
 
@@ -1850,7 +1849,7 @@
                             <div className="auth-controls" style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 {isLoggedIn ? (
                                     <>
-                                        <span style={{ color: '#fff', fontSize: '0.85rem' }}>
+                                        <span style={{ color: 'var(--text)', fontSize: '0.85rem' }}>
                                             👤 {authUsername} {authRole ? `(${authRole})` : ''}
                                         </span>
                                         <button
@@ -2143,14 +2142,14 @@
                                         border: 'none',
                                         borderRadius: '5px',
                                         cursor: 'pointer',
-                                        background: activeTab === 'all' ? '#1e40af' : '#ddd',
-                                        color: activeTab === 'all' ? 'white' : '#333',
+                                         background: activeTab === 'all' ? 'var(--brand-blue)' : '#ddd',
+                                        color: activeTab === 'all' ? 'var(--text)' : '#333',
                                         fontWeight: 600
                                     }}
                                 >
                                     All Products
                                 </button>
-                                {categoriesLoading && <span style={{padding: '0.7rem', color: '#475569'}}>Loading categories...</span>}
+                                {categoriesLoading && <span style={{padding: '0.7rem', color: '#6b7280'}}>Loading categories...</span>}
                                 {!categoriesLoading && categories.map((category, index) => {
                                     const categoryValue = category.catName || category.name || category.categoryName;
                                     const categoryId = category.cateId || category.id || category.categoryId || category.catId || categoryValue || index;
@@ -2166,8 +2165,8 @@
                                                     border: 'none',
                                                     borderRadius: '5px',
                                                     cursor: 'pointer',
-                                                    background: activeTab === categoryId ? '#1e40af' : '#ddd',
-                                                    color: activeTab === categoryId ? 'white' : '#333',
+                                                     background: activeTab === categoryId ? 'var(--brand-blue)' : '#ddd',
+                                                    color: activeTab === categoryId ? 'var(--text)' : '#333',
                                                     fontWeight: 600
                                                 }}
                                             >
@@ -2240,13 +2239,13 @@
 
                             <div className="product-grid">
                                 {loading && (
-                                    <p style={{gridColumn: '1/-1', textAlign: 'center', color: '#475569', padding: '3rem'}}>Loading products...</p>
+                                    <p style={{gridColumn: '1/-1', textAlign: 'center', color: '#6b7280', padding: '3rem'}}>Loading products...</p>
                                 )}
                                 {error && (
                                     <p style={{gridColumn: '1/-1', textAlign: 'center', color: '#dc2626', padding: '3rem'}}>⚠️ Could not load products. Please ensure the API is running.<br/><small>{error}</small></p>
                                 )}
                                 {!loading && !error && products.length === 0 && (
-                                    <p style={{gridColumn: '1/-1', textAlign: 'center', color: '#475569', padding: '3rem'}}>No products found in this category.</p>
+                                    <p style={{gridColumn: '1/-1', textAlign: 'center', color: '#6b7280', padding: '3rem'}}>No products found in this category.</p>
                                 )}
                                 {productMessage && (
                                     <p style={{gridColumn: '1/-1', textAlign: 'center', color: productMessage.type === 'error' ? '#dc2626' : '#16a34a', fontWeight: 600}}>
@@ -2393,7 +2392,7 @@
                                                     )}
                                                 </div>
                                             ) : (
-                                                <div style={{background: '#1e40af', color: 'white', fontSize: '3rem', padding: '2rem', textAlign: 'center'}}>
+                                                 <div style={{background: 'var(--brand-blue)', color: 'var(--text)', fontSize: '3rem', padding: '2rem', textAlign: 'center'}}>
                                                     📦
                                                 </div>
                                             )}
@@ -2401,7 +2400,7 @@
                                                 <h3>{productName}</h3>
                                                 {productDescription && <p>{productDescription}</p>}
                                                 {isAdmin && (
-                                                <label style={{ display: 'block', fontSize: '0.75rem', color: '#475569', marginBottom: '0.5rem', cursor: 'pointer' }}>
+                                                <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.5rem', cursor: 'pointer' }}>
                                                     {uploadingImagesForId === productId ? 'Uploading...' : '📤 Upload image(s)'}
                                                     <input
                                                         type="file"
@@ -2491,7 +2490,7 @@
                             ) : (
                             <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem', marginTop: '2rem'}}>
                                 {offers.map((offer) => (
-                                    <div key={offer.offerId} style={{background: 'white', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '1.2rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)'}}>
+                                    <div key={offer.offerId} style={{background: 'white', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '1.2rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)'}}>
                                         {editingOfferId === offer.offerId ? (
                                             <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
                                                 <input
@@ -2530,7 +2529,7 @@
                                                     )}
                                                 </div>
                                                 {offer.description && (
-                                                    <p style={{marginTop: '0.5rem', color: '#475569', fontSize: '0.9rem'}}>{offer.description}</p>
+                                                    <p style={{marginTop: '0.5rem', color: '#6b7280', fontSize: '0.9rem'}}>{offer.description}</p>
                                                 )}
                                             </>
                                         )}
@@ -2591,7 +2590,7 @@
                             ) : (
                             <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem', marginTop: '2rem'}}>
                                 {trustedCompanies.map((client) => (
-                                    <div key={client.trustedCompanyId} style={{background: 'white', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '1rem 1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.6rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', fontWeight: 600, color: '#1e40af', fontSize: '0.9rem'}}>
+                                     <div key={client.trustedCompanyId} style={{background: 'white', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '1rem 1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.6rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', fontWeight: 600, color: 'var(--text)', fontSize: '0.9rem'}}>
                                         {editingTrustedCompanyId === client.trustedCompanyId ? (
                                             <div style={{display: 'flex', gap: '0.4rem', width: '100%'}}>
                                                 <input
