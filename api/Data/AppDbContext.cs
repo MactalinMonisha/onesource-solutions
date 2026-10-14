@@ -12,6 +12,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Contact> Contacts => Set<Contact>();
     public DbSet<Offer> Offers => Set<Offer>();
     public DbSet<TrustedCompany> TrustedCompanies => Set<TrustedCompany>();
+    public DbSet<AboutContent> AboutContents => Set<AboutContent>();
+    public DbSet<AboutImage> AboutImages => Set<AboutImage>();
+    public DbSet<HomeContent> HomeContents => Set<HomeContent>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -72,6 +75,32 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         {
             e.HasKey(c => c.TrustedCompanyId);
             e.Property(c => c.CompanyName).IsRequired().HasMaxLength(200);
+            e.Property(c => c.LogoUrl).HasMaxLength(500);
+        });
+
+        modelBuilder.Entity<AboutContent>(e =>
+        {
+            e.HasKey(a => a.AboutContentId);
+            e.Property(a => a.Heading).IsRequired().HasMaxLength(250);
+            e.Property(a => a.Description).IsRequired().HasMaxLength(5000);
+
+            e.HasMany(a => a.Images)
+                .WithOne(i => i.AboutContent)
+                .HasForeignKey(i => i.AboutContentId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<AboutImage>(e =>
+        {
+            e.HasKey(i => i.AboutImageId);
+            e.Property(i => i.ImageUrl).IsRequired().HasMaxLength(500);
+        });
+
+        modelBuilder.Entity<HomeContent>(e =>
+        {
+            e.HasKey(h => h.HomeContentId);
+            e.Property(h => h.Heading).IsRequired().HasMaxLength(250);
+            e.Property(h => h.Description).IsRequired().HasMaxLength(5000);
         });
     }
 

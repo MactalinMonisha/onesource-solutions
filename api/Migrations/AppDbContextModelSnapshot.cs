@@ -22,6 +22,67 @@ namespace OneSource.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("OneSource.Api.Models.AboutContent", b =>
+                {
+                    b.Property<int>("AboutContentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AboutContentId"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(5000)
+                        .HasColumnType("character varying(5000)");
+
+                    b.Property<string>("Heading")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("AboutContentId");
+
+                    b.ToTable("AboutContents");
+                });
+
+            modelBuilder.Entity("OneSource.Api.Models.AboutImage", b =>
+                {
+                    b.Property<int>("AboutImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AboutImageId"));
+
+                    b.Property<int>("AboutContentId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("AboutImageId");
+
+                    b.HasIndex("AboutContentId");
+
+                    b.ToTable("AboutImages");
+                });
+
             modelBuilder.Entity("OneSource.Api.Models.Contact", b =>
                 {
                     b.Property<int>("ContactId")
@@ -59,6 +120,35 @@ namespace OneSource.Api.Migrations
                     b.HasKey("ContactId");
 
                     b.ToTable("Contacts");
+                });
+
+            modelBuilder.Entity("OneSource.Api.Models.HomeContent", b =>
+                {
+                    b.Property<int>("HomeContentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("HomeContentId"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(5000)
+                        .HasColumnType("character varying(5000)");
+
+                    b.Property<string>("Heading")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("HomeContentId");
+
+                    b.ToTable("HomeContents");
                 });
 
             modelBuilder.Entity("OneSource.Api.Models.Offer", b =>
@@ -208,6 +298,10 @@ namespace OneSource.Api.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("LogoUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -254,6 +348,17 @@ namespace OneSource.Api.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("OneSource.Api.Models.AboutImage", b =>
+                {
+                    b.HasOne("OneSource.Api.Models.AboutContent", "AboutContent")
+                        .WithMany("Images")
+                        .HasForeignKey("AboutContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AboutContent");
+                });
+
             modelBuilder.Entity("OneSource.Api.Models.Product", b =>
                 {
                     b.HasOne("OneSource.Api.Models.ProductCategory", "Category")
@@ -274,6 +379,11 @@ namespace OneSource.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("OneSource.Api.Models.AboutContent", b =>
+                {
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("OneSource.Api.Models.Product", b =>

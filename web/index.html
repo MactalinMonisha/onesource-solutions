@@ -46,6 +46,156 @@
             scroll-behavior: smooth;
         }
 
+        #root {
+            display: flex;
+            flex-direction: column;
+        }
+
+        header { order: 0; }
+        .image-carousel { order: 1; }
+        .hero { order: 2; }
+        .why-section { order: 3; }
+        .about-section { order: 4; }
+        .offers-section { order: 5; }
+        .products-section { order: 6; }
+        .trusted-section { order: 7; }
+        #contact { order: 8; }
+        footer { order: 9; }
+
+        .image-carousel {
+            position: relative;
+            height: clamp(260px, 38vw, 480px);
+            overflow: hidden;
+            background: #20252b;
+        }
+
+        .image-carousel-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.7s ease;
+        }
+
+        .image-carousel-slide.active {
+            opacity: 1;
+        }
+
+        .image-carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-carousel-slide::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(13, 20, 26, 0.68), rgba(13, 20, 26, 0.08) 78%);
+        }
+
+        .image-carousel-caption {
+            position: absolute;
+            z-index: 1;
+            left: max(2rem, calc((100% - 1120px) / 2));
+            bottom: 5rem;
+            max-width: 620px;
+            color: white;
+        }
+
+        .image-carousel-caption span {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #a9ddfa;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .image-carousel-caption h2 {
+            font-size: clamp(1.8rem, 4vw, 3.2rem);
+            line-height: 1.1;
+        }
+
+        .carousel-controls {
+            position: absolute;
+            z-index: 2;
+            left: max(2rem, calc((100% - 1120px) / 2));
+            bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+
+        .carousel-arrow {
+            width: 42px;
+            height: 42px;
+            border: 1px solid rgba(32, 37, 43, 0.25);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.55);
+            color: var(--text);
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+
+        .carousel-dots {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        .carousel-dot {
+            width: 9px;
+            height: 9px;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(32, 37, 43, 0.35);
+            cursor: pointer;
+        }
+
+        .carousel-dot[aria-current="true"] {
+            width: 24px;
+            border-radius: 8px;
+            background: #ea580c;
+        }
+
+        @media (max-width: 700px) {
+            nav {
+                gap: 1rem;
+                flex-wrap: wrap;
+                padding: 0 1rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 3.5rem 1rem;
+            }
+
+            .image-carousel {
+                height: 300px;
+            }
+
+            .image-carousel-caption,
+            .carousel-controls {
+                left: 1rem;
+            }
+
+            .image-carousel-caption {
+                right: 1rem;
+                bottom: 4.5rem;
+            }
+
+            .carousel-controls {
+                bottom: 0.9rem;
+            }
+        }
+
         body {
             font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.6;
@@ -1053,6 +1203,7 @@
     <script type="text/babel">
         function SalesPage() {
             const [activeTab, setActiveTab] = React.useState('all');
+            const [imageSlide, setImageSlide] = React.useState(0);
             const [products, setProducts] = React.useState([]);
             const [loading, setLoading] = React.useState(true);
             const [error, setError] = React.useState(null);
@@ -1088,14 +1239,24 @@
             const [contactSubmitting, setContactSubmitting] = React.useState(false);
             const [contactMessage, setContactMessage] = React.useState(null);
 
+            const [homeContent, setHomeContent] = React.useState({
+                heading: 'Empowering You with the Latest in IT & Technology',
+                description: 'OneSource Solutions Limited is an ICT company providing customized hardware and software solutions to enable vital business processes across varied sectors. As KRA authorized suppliers of Electronic Fiscal Devices and providers of hospitality, payroll, networking, and CCTV solutions, we\'re your complete technology partner in Nairobi.'
+            });
+            const [showHomeContentForm, setShowHomeContentForm] = React.useState(false);
+            const [homeHeading, setHomeHeading] = React.useState('');
+            const [homeDescription, setHomeDescription] = React.useState('');
+            const [homeContentSubmitting, setHomeContentSubmitting] = React.useState(false);
+            const [homeContentMessage, setHomeContentMessage] = React.useState(null);
+
             const [trustedCompanies, setTrustedCompanies] = React.useState([]);
             const [trustedCompaniesLoading, setTrustedCompaniesLoading] = React.useState(true);
             const [showTrustedCompanyForm, setShowTrustedCompanyForm] = React.useState(false);
             const [newTrustedCompanyName, setNewTrustedCompanyName] = React.useState('');
+            const [newTrustedCompanyLogo, setNewTrustedCompanyLogo] = React.useState(null);
             const [trustedCompanySubmitting, setTrustedCompanySubmitting] = React.useState(false);
             const [trustedCompanyMessage, setTrustedCompanyMessage] = React.useState(null);
-            const [editingTrustedCompanyId, setEditingTrustedCompanyId] = React.useState(null);
-            const [editingTrustedCompanyName, setEditingTrustedCompanyName] = React.useState('');
+            const [uploadingTrustedCompanyId, setUploadingTrustedCompanyId] = React.useState(null);
             const [deletingTrustedCompanyId, setDeletingTrustedCompanyId] = React.useState(null);
 
             const [offers, setOffers] = React.useState([]);
@@ -1122,10 +1283,61 @@
             const isLoggedIn = !!authToken;
             const isAdmin = isLoggedIn && authRole === 'Admin';
 
+            const imageSlides = [
+                {
+                    image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=2000&q=85',
+                    alt: 'Rows of server racks in a modern data center',
+                    label: 'Reliable infrastructure',
+                    title: 'Technology built for business'
+                },
+                {
+                    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=2000&q=85',
+                    alt: 'Close-up of modern computer components and circuit board',
+                    label: 'Hardware and systems',
+                    title: 'The right tools for every workday'
+                },
+                {
+                    image: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=2000&q=85',
+                    alt: 'Bright, connected modern office workspace',
+                    label: 'Support that stays with you',
+                    title: 'A practical partner for your next step'
+                }
+            ];
+
+            React.useEffect(() => {
+                const timer = window.setInterval(() => {
+                    setImageSlide((current) => (current + 1) % imageSlides.length);
+                }, 5500);
+                return () => window.clearInterval(timer);
+            }, []);
+
+            const moveImageSlide = (direction) => {
+                setImageSlide((current) => (current + direction + imageSlides.length) % imageSlides.length);
+            };
+
             const authHeaders = () => (authToken ? { 'Authorization': `Bearer ${authToken}` } : {});
 
-            const API_BASE = 'https://onesource-api.onrender.com/api';
-            const CATEGORY_API_URL = 'https://onesource-api.onrender.com/api/ProductCategories';
+            const isLocalPreview = window.location.protocol === 'file:' || ['localhost', '127.0.0.1'].includes(window.location.hostname);
+            const API_BASE = window.ONESOURCE_API_BASE || (isLocalPreview ? 'http://localhost:5055/api' : 'https://onesource-api.onrender.com/api');
+            const API_ROOT = API_BASE.replace(/\/api$/, '');
+            const CATEGORY_API_URL = `${API_BASE}/ProductCategories`;
+
+            const loadHomeContent = async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/Home`);
+                    if (!response.ok) throw new Error(`Request failed (${response.status})`);
+                    const result = await response.json();
+                    setHomeContent(result);
+                    setHomeHeading(result.heading || '');
+                    setHomeDescription(result.description || '');
+                } catch (err) {
+                    console.error('Failed to load home content', err);
+                }
+            };
+
+            React.useEffect(() => {
+                loadHomeContent();
+            }, []);
 
             const loadCategories = async () => {
                 setCategoriesLoading(true);
@@ -1391,12 +1603,52 @@
                 }
             };
 
+            const updateHomeContent = async (event) => {
+                event.preventDefault();
+                const trimmedHeading = homeHeading.trim();
+                const trimmedDescription = homeDescription.trim();
+                if (!trimmedHeading || !trimmedDescription) {
+                    setHomeContentMessage({ type: 'error', text: 'Heading and description are required.' });
+                    return;
+                }
+
+                setHomeContentSubmitting(true);
+                setHomeContentMessage(null);
+                try {
+                    const response = await fetch(`${API_BASE}/Home`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                        body: JSON.stringify({ heading: trimmedHeading, description: trimmedDescription })
+                    });
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('You must be logged in as Admin to edit home content.');
+                    }
+                    if (!response.ok) throw new Error(`Request failed (${response.status})`);
+
+                    const result = await response.json();
+                    setHomeContent(result);
+                    setHomeHeading(result.heading);
+                    setHomeDescription(result.description);
+                    setShowHomeContentForm(false);
+                    setHomeContentMessage({ type: 'success', text: 'Home content saved.' });
+                } catch (err) {
+                    setHomeContentMessage({ type: 'error', text: `Could not save home content: ${err.message}` });
+                } finally {
+                    setHomeContentSubmitting(false);
+                }
+            };
+
             const addTrustedCompany = async (event) => {
                 event.preventDefault();
+                const form = event.currentTarget;
                 const trimmedName = newTrustedCompanyName.trim();
 
                 if (!trimmedName) {
                     setTrustedCompanyMessage({ type: 'error', text: 'Company name is required.' });
+                    return;
+                }
+                if (!newTrustedCompanyLogo) {
+                    setTrustedCompanyMessage({ type: 'error', text: 'Select a logo image.' });
                     return;
                 }
 
@@ -1404,10 +1656,13 @@
                 setTrustedCompanyMessage(null);
 
                 try {
-                    const response = await fetch(`${API_BASE}/TrustedCompanies`, {
+                    const formData = new FormData();
+                    formData.append('companyName', trimmedName);
+                    formData.append('logo', newTrustedCompanyLogo);
+                    const response = await fetch(`${API_BASE}/TrustedCompanies/with-logo`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json', ...authHeaders() },
-                        body: JSON.stringify({ companyName: trimmedName })
+                        headers: { ...authHeaders() },
+                        body: formData
                     });
 
                     if (response.status === 401 || response.status === 403) {
@@ -1418,7 +1673,9 @@
                     }
 
                     setNewTrustedCompanyName('');
-                    setTrustedCompanyMessage({ type: 'success', text: 'Company added successfully.' });
+                    setNewTrustedCompanyLogo(null);
+                    form.reset();
+                    setTrustedCompanyMessage({ type: 'success', text: 'Company logo added successfully.' });
                     loadTrustedCompanies();
                 } catch (err) {
                     setTrustedCompanyMessage({ type: 'error', text: `Could not add company: ${err.message}` });
@@ -1427,44 +1684,32 @@
                 }
             };
 
-            const startEditTrustedCompany = (company) => {
-                setEditingTrustedCompanyId(company.trustedCompanyId);
-                setEditingTrustedCompanyName(company.companyName);
+            const uploadTrustedCompanyLogo = async (companyId, file) => {
+                if (!file) return;
+                setUploadingTrustedCompanyId(companyId);
                 setTrustedCompanyMessage(null);
-            };
-
-            const saveEditTrustedCompany = async (companyId) => {
-                const trimmedName = editingTrustedCompanyName.trim();
-                if (!trimmedName) {
-                    setTrustedCompanyMessage({ type: 'error', text: 'Company name is required.' });
-                    return;
-                }
-
-                setTrustedCompanySubmitting(true);
-                setTrustedCompanyMessage(null);
-
                 try {
-                    const response = await fetch(`${API_BASE}/TrustedCompanies/${companyId}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json', ...authHeaders() },
-                        body: JSON.stringify({ companyName: trimmedName })
+                    const formData = new FormData();
+                    formData.append('logo', file);
+                    const response = await fetch(`${API_BASE}/TrustedCompanies/${companyId}/logo`, {
+                        method: 'POST',
+                        headers: { ...authHeaders() },
+                        body: formData
                     });
 
                     if (response.status === 401 || response.status === 403) {
-                        throw new Error('You must be logged in as Admin to edit a company.');
+                        throw new Error('You must be logged in as Admin to upload a company logo.');
                     }
                     if (!response.ok) {
                         throw new Error(`Request failed (${response.status})`);
                     }
 
-                    setEditingTrustedCompanyId(null);
-                    setEditingTrustedCompanyName('');
-                    setTrustedCompanyMessage({ type: 'success', text: 'Company updated successfully.' });
+                    setTrustedCompanyMessage({ type: 'success', text: 'Company logo updated successfully.' });
                     loadTrustedCompanies();
                 } catch (err) {
-                    setTrustedCompanyMessage({ type: 'error', text: `Could not update company: ${err.message}` });
+                    setTrustedCompanyMessage({ type: 'error', text: `Could not upload company logo: ${err.message}` });
                 } finally {
-                    setTrustedCompanySubmitting(false);
+                    setUploadingTrustedCompanyId(null);
                 }
             };
 
@@ -1784,14 +2029,6 @@
                 }
             };
 
-            const services = [
-                { name: "TIMS", desc: "Certified tax devices and middleware" },
-                { name: "eTIMS", desc: "Software for invoicing and digital tax compliance" },
-                { name: "POS", desc: "Retail hardware for smooth daily transactions" },
-                { name: "IT", desc: "Networking, cabling, servers, and support" },
-                { name: "Security", desc: "CCTV systems with remote monitoring" }
-            ];
-
             return (
                 <>
                     <div className="splash-screen">
@@ -1815,43 +2052,22 @@
                                 <li>
                                     <div className="dropdown">
                                         <button className="dropdown-button">
-                                            Products <span>▼</span>
+                                            Solutions <span>▼</span>
                                         </button>
                                         <div className="dropdown-menu">
-                                            <a href="#products" onClick={() => setActiveTab('tims')}>TIMS</a>
-                                            <a href="#products" onClick={() => setActiveTab('etims')}>eTIMS</a>
-                                            <a href="#products" onClick={() => setActiveTab('pos')}>POS Hardware</a>
-                                            <a href="#products" onClick={() => setActiveTab('it')}>IT Hardware</a>
-                                            <a href="#products" onClick={() => setActiveTab('security')}>Security</a>
+                                            <a href="#solutions" onClick={() => setActiveTab('tims')}>TIMS</a>
+                                            <a href="#solutions" onClick={() => setActiveTab('etims')}>eTIMS</a>
+                                            <a href="#solutions" onClick={() => setActiveTab('pos')}>POS Hardware</a>
+                                            <a href="#solutions" onClick={() => setActiveTab('it')}>IT Hardware</a>
+                                            <a href="#solutions" onClick={() => setActiveTab('security')}>Security</a>
                                         </div>
                                     </div>
                                 </li>
                                 <li>
-                                    <div className="dropdown">
-                                        <button className="dropdown-button">
-                                            Services <span>▼</span>
-                                        </button>
-                                        <div className="dropdown-menu">
-                                            <a href="#services">TIMS Solutions</a>
-                                            <a href="#services">eTIMS Software</a>
-                                            <a href="#services">POS Systems</a>
-                                            <a href="#services">IT Infrastructure</a>
-                                            <a href="#services">Security Systems</a>
-                                        </div>
-                                    </div>
+                                    <a href="about.html">About</a>
                                 </li>
                                 <li>
-                                    <div className="dropdown">
-                                        <button className="dropdown-button">
-                                            Contact <span>▼</span>
-                                        </button>
-                                        <div className="dropdown-menu">
-                                            <a href={`mailto:${contact?.email || 'info@onesourcesolutionske.com'}`}>📧 Email</a>
-                                            <a href={`https://wa.me/${(contact?.whatsApp || '+254735610610').replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer">📱 WhatsApp</a>
-                                            <a href={`tel:${contact?.phone || '+254207903190'}`}>☎️ Phone</a>
-                                            <a href="https://maps.google.com/?q=OneSource+Solutions+Kenya" target="_blank" rel="noreferrer">📍 Location</a>
-                                        </div>
-                                    </div>
+                                    <a href="#contact">Contact</a>
                                 </li>
                             </ul>
                             <div className="auth-controls" style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -1927,14 +2143,42 @@
                         </nav>
                     </header>
 
+                    <section className="image-carousel" aria-label="OneSource Solutions highlights">
+                        {imageSlides.map((slide, index) => (
+                            <div className={`image-carousel-slide${imageSlide === index ? ' active' : ''}`} key={slide.image} aria-hidden={imageSlide !== index}>
+                                <img src={slide.image} alt={slide.alt} />
+                                <div className="image-carousel-caption">
+                                    <span>{slide.label}</span>
+                                    <h2>{slide.title}</h2>
+                                </div>
+                            </div>
+                        ))}
+                        <div className="carousel-controls" aria-label="Image carousel controls">
+                            <button type="button" className="carousel-arrow" onClick={() => moveImageSlide(-1)} aria-label="Previous image">‹</button>
+                            <div className="carousel-dots">
+                                {imageSlides.map((slide, index) => (
+                                    <button
+                                        key={slide.image}
+                                        type="button"
+                                        className="carousel-dot"
+                                        aria-label={`Show image ${index + 1}`}
+                                        aria-current={imageSlide === index}
+                                        onClick={() => setImageSlide(index)}
+                                    />
+                                ))}
+                            </div>
+                            <button type="button" className="carousel-arrow" onClick={() => moveImageSlide(1)} aria-label="Next image">›</button>
+                        </div>
+                    </section>
+
                     <section className="hero">
                         <div className="hero-content">
                             <div className="hero-copy">
                                 <span className="eyebrow">Trusted ICT Partner in Kenya</span>
-                                <h1>Empowering You with the Latest in IT &amp; Technology</h1>
-                                <p>Onesource Solutions Limited is an ICT company providing customized hardware and software solutions to enable vital business processes across varied sectors. As KRA authorized suppliers of Electronic Fiscal Devices, and providers of hospitality, payroll, networking, and CCTV solutions — we're your complete technology partner in Nairobi.</p>
+                                <h1>{homeContent.heading}</h1>
+                                <p>{homeContent.description}</p>
                                 <div className="hero-actions">
-                                    <a href="#products" className="cta-button">View Our Products</a>
+                                    <a href="#solutions" className="cta-button">Explore Solutions</a>
                                     <a href="#contact" className="cta-button secondary">Get In Touch</a>
                                 </div>
                                 <div className="badges hero-badges">
@@ -1942,6 +2186,29 @@
                                     <span className="badge">✓ KRA Licensed</span>
                                     <span className="badge">✓ Certified Solutions</span>
                                 </div>
+                                {isAdmin && (
+                                    <div style={{marginTop: '1.5rem'}}>
+                                        <button type="button" className="enquire-btn" onClick={() => setShowHomeContentForm((visible) => !visible)}>
+                                            {showHomeContentForm ? 'Close Home Editor' : 'Edit Home Heading & Description'}
+                                        </button>
+                                        {showHomeContentForm && (
+                                            <form onSubmit={updateHomeContent} className="category-form" style={{margin: '1rem 0 0'}}>
+                                                <label style={{display: 'block', marginBottom: '0.75rem', color: 'var(--text)', textAlign: 'left', fontWeight: 600}}>
+                                                    Home heading
+                                                    <input type="text" maxLength="250" value={homeHeading} onChange={(event) => setHomeHeading(event.target.value)} required />
+                                                </label>
+                                                <label style={{display: 'block', marginBottom: '0.75rem', color: 'var(--text)', textAlign: 'left', fontWeight: 600}}>
+                                                    Home description
+                                                    <textarea maxLength="5000" rows="5" value={homeDescription} onChange={(event) => setHomeDescription(event.target.value)} required style={{width: '100%', resize: 'vertical', padding: '0.7rem 0.8rem', font: 'inherit'}} />
+                                                </label>
+                                                <button type="submit" className="enquire-btn" disabled={homeContentSubmitting}>
+                                                    {homeContentSubmitting ? 'Saving...' : 'Save Home Content'}
+                                                </button>
+                                                {homeContentMessage && <p className={`category-form-message ${homeContentMessage.type}`} role="status">{homeContentMessage.text}</p>}
+                                            </form>
+                                        )}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="hero-panel">
@@ -1974,7 +2241,7 @@
                         </div>
                     </section>
 
-                    <section className="section">
+                    <section className="section why-section">
                         <div className="container">
                             <h2 className="section-title">Why Choose OneSource Solutions?</h2>
                             <div className="features">
@@ -2012,24 +2279,95 @@
                         </div>
                     </section>
 
-                    <section id="services" className="section">
+                    <section id="about" className="section about-section">
                         <div className="container">
-                            <h2 className="section-title">Our Core Services</h2>
-                            <div className="service-grid">
-                                {services.map((service, idx) => (
-                                    <div key={idx} className="service-card">
-                                        <span className="service-tag">{service.name}</span>
-                                        <h3>{service.name}</h3>
-                                        <p>{service.desc}</p>
-                                    </div>
-                                ))}
+                            <h2 className="section-title">About OneSource</h2>
+                            <div style={{maxWidth: '860px', margin: '0 auto', textAlign: 'center', color: 'var(--muted)', fontSize: '1.05rem'}}>
+                                <p>OneSource Solutions Limited is a Nairobi-based ICT partner helping businesses work smarter through dependable technology. We bring together business hardware, tax-compliant systems, software, networking, and security solutions, with practical guidance from selection through implementation and ongoing support.</p>
+                                <p style={{marginTop: '1rem'}}>Our team works with organizations across retail, hospitality, healthcare, and other sectors to match the right technology to the way each business operates.</p>
+                                <a href="about.html" className="cta-button" style={{marginTop: '1.5rem'}}>Visit About OneSource</a>
                             </div>
                         </div>
                     </section>
 
-                    <section id="products" className="products-section section">
+                    <section id="offers" className="section offers-section">
                         <div className="container">
-                            <h2 className="section-title">Featured Products</h2>
+                            <h2 className="section-title">Current Offers</h2>
+
+                            {isAdmin && (
+                            <div className="category-form" style={{marginBottom: '1.5rem'}}>
+                                <button
+                                    type="button"
+                                    className="enquire-btn"
+                                    onClick={() => {
+                                        setShowOfferForm((isVisible) => !isVisible);
+                                        setOfferMessage(null);
+                                    }}
+                                >
+                                    {showOfferForm ? 'Close Offer Form' : '+ Add Offer'}
+                                </button>
+
+                                {showOfferForm && (
+                                    <form onSubmit={addOffer} style={{marginTop: '1rem'}}>
+                                        <div className="category-form-fields">
+                                            <label>
+                                                Offer name
+                                                <input type="text" value={newOfferName} onChange={(event) => setNewOfferName(event.target.value)} placeholder="e.g. 10% Offer" required />
+                                            </label>
+                                            <label>
+                                                Description
+                                                <input type="text" value={newOfferDescription} onChange={(event) => setNewOfferDescription(event.target.value)} placeholder="e.g. Purchase with product code HRKDNS908" />
+                                            </label>
+                                            <button type="submit" className="enquire-btn" disabled={offerSubmitting}>
+                                                {offerSubmitting ? 'Adding...' : 'Save Offer'}
+                                            </button>
+                                        </div>
+                                    </form>
+                                )}
+
+                                {offerMessage && <p className={`category-form-message ${offerMessage.type}`} role="status">{offerMessage.text}</p>}
+                            </div>
+                            )}
+
+                            {offersLoading ? (
+                                <p>Loading offers...</p>
+                            ) : offers.length === 0 ? (
+                                <p>No current offers. Check back soon!</p>
+                            ) : (
+                                <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem', marginTop: '2rem'}}>
+                                    {offers.map((offer) => (
+                                        <div key={offer.offerId} style={{background: 'white', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '1.2rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)'}}>
+                                            {editingOfferId === offer.offerId ? (
+                                                <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                                                    <input type="text" value={editingOfferName} onChange={(event) => setEditingOfferName(event.target.value)} placeholder="Offer name" />
+                                                    <input type="text" value={editingOfferDescription} onChange={(event) => setEditingOfferDescription(event.target.value)} placeholder="Description" />
+                                                    <div style={{display: 'flex', gap: '0.4rem'}}>
+                                                        <button type="button" className="enquire-btn" onClick={() => saveEditOffer(offer.offerId)} disabled={offerSubmitting}>Save</button>
+                                                        <button type="button" onClick={() => setEditingOfferId(null)}>Cancel</button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.6rem'}}>
+                                                        <h3 style={{color: '#ea580c', margin: 0, fontSize: '1.1rem'}}>🎁 {offer.offerName}</h3>
+                                                        {isAdmin && <span style={{display: 'flex', gap: '0.4rem', flexShrink: 0}}>
+                                                            <button type="button" onClick={() => startEditOffer(offer)} title="Edit">✏️</button>
+                                                            <button type="button" onClick={() => deleteOffer(offer.offerId, offer.offerName)} disabled={deletingOfferId === offer.offerId} title="Delete">{deletingOfferId === offer.offerId ? '...' : '🗑️'}</button>
+                                                        </span>}
+                                                    </div>
+                                                    {offer.description && <p style={{marginTop: '0.5rem', color: '#6b7280', fontSize: '0.9rem'}}>{offer.description}</p>}
+                                                </>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </section>
+
+                    <section id="solutions" className="products-section section">
+                        <div className="container">
+                            <h2 className="section-title">Our Solutions</h2>
 
                             {isAdmin && (
                             <div className="category-form">
@@ -2155,7 +2493,7 @@
                                         fontWeight: 600
                                     }}
                                 >
-                                    All Products
+                                    All Solutions
                                 </button>
                                 {categoriesLoading && <span style={{padding: '0.7rem', color: '#6b7280'}}>Loading categories...</span>}
                                 {!categoriesLoading && categories.map((category, index) => {
@@ -2272,7 +2610,7 @@
                                     const currentImageId = currentImage ? (currentImage.productImageId || currentImage.id) : null;
                                     const rawImageUrl = currentImage ? (currentImage.imageUrl || currentImage.url) : null;
                                     const primaryImage = rawImageUrl
-                                        ? (rawImageUrl.startsWith('http') ? rawImageUrl : `https://onesource-api.onrender.com${rawImageUrl}`)
+                                        ? (rawImageUrl.startsWith('http') ? rawImageUrl : `${API_ROOT}${rawImageUrl}`)
                                         : null;
 
                                     return (
@@ -2437,7 +2775,7 @@
                         </div>
                     </section>
 
-                    <section id="offers" className="section">
+                    {false && (<section id="offers" className="section">
                         <div className="container">
                             <h2 className="section-title">Current Offers</h2>
 
@@ -2546,9 +2884,9 @@
                             </div>
                             )}
                         </div>
-                    </section>
+                    </section>)}
 
-                    <section className="section">
+                    <section className="section trusted-section">
                         <div className="container">
                             <h2 className="section-title">Trusted by Leading Companies</h2>
 
@@ -2578,8 +2916,17 @@
                                                     required
                                                 />
                                             </label>
+                                            <label>
+                                                Company logo
+                                                <input
+                                                    type="file"
+                                                    accept="image/jpeg,image/png,image/webp,image/gif"
+                                                    onChange={(event) => setNewTrustedCompanyLogo(event.target.files?.[0] || null)}
+                                                    required
+                                                />
+                                            </label>
                                             <button type="submit" className="enquire-btn" disabled={trustedCompanySubmitting}>
-                                                {trustedCompanySubmitting ? 'Adding...' : 'Save Company'}
+                                                {trustedCompanySubmitting ? 'Saving...' : 'Save Company Logo'}
                                             </button>
                                         </div>
                                     </form>
@@ -2590,49 +2937,59 @@
                                         {trustedCompanyMessage.text}
                                     </p>
                                 )}
+
+                                {!trustedCompaniesLoading && (
+                                    <div style={{display: 'grid', gap: '0.6rem', marginTop: '1.5rem'}}>
+                                        {trustedCompanies.map((client) => (
+                                            <div key={client.trustedCompanyId} style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', padding: '0.65rem 0', borderBottom: '1px solid #e5e7eb'}}>
+                                                <span>{client.companyName}</span>
+                                                <span style={{display: 'flex', alignItems: 'center', gap: '0.65rem'}}>
+                                                    <label className="enquire-btn" style={{padding: '0.4rem 0.75rem', fontSize: '0.85rem', cursor: 'pointer'}}>
+                                                        {uploadingTrustedCompanyId === client.trustedCompanyId ? 'Uploading...' : client.logoUrl ? 'Replace logo' : 'Upload logo'}
+                                                        <input
+                                                            type="file"
+                                                            accept="image/jpeg,image/png,image/webp,image/gif"
+                                                            disabled={uploadingTrustedCompanyId === client.trustedCompanyId}
+                                                            onChange={(event) => {
+                                                                uploadTrustedCompanyLogo(client.trustedCompanyId, event.target.files?.[0]);
+                                                                event.target.value = '';
+                                                            }}
+                                                            style={{display: 'none'}}
+                                                        />
+                                                    </label>
+                                                    <button
+                                                        type="button"
+                                                        className="enquire-btn"
+                                                        style={{padding: '0.4rem 0.75rem', fontSize: '0.85rem', background: '#b42318'}}
+                                                        onClick={() => deleteTrustedCompany(client.trustedCompanyId, client.companyName)}
+                                                        disabled={deletingTrustedCompanyId === client.trustedCompanyId}
+                                                        title="Remove company"
+                                                    >
+                                                        {deletingTrustedCompanyId === client.trustedCompanyId ? '...' : 'Remove'}
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                             )}
 
                             {trustedCompaniesLoading ? (
                                 <p>Loading trusted companies...</p>
                             ) : (
-                            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem', marginTop: '2rem'}}>
-                                {trustedCompanies.map((client) => (
-                                     <div key={client.trustedCompanyId} style={{background: 'white', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '1rem 1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.6rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', fontWeight: 600, color: 'var(--text)', fontSize: '0.9rem'}}>
-                                        {editingTrustedCompanyId === client.trustedCompanyId ? (
-                                            <div style={{display: 'flex', gap: '0.4rem', width: '100%'}}>
-                                                <input
-                                                    type="text"
-                                                    value={editingTrustedCompanyName}
-                                                    onChange={(event) => setEditingTrustedCompanyName(event.target.value)}
-                                                    style={{flex: 1, minWidth: 0}}
-                                                />
-                                                <button type="button" className="enquire-btn" onClick={() => saveEditTrustedCompany(client.trustedCompanyId)} disabled={trustedCompanySubmitting}>Save</button>
-                                                <button type="button" onClick={() => setEditingTrustedCompanyId(null)}>Cancel</button>
-                                            </div>
-                                        ) : (
-                                            <>
-                                                <span style={{display: 'flex', alignItems: 'center', gap: '0.6rem'}}>
-                                                    <span style={{color: '#ea580c', fontWeight: 800}}>✓</span>
-                                                    {client.companyName}
-                                                </span>
-                                                {isAdmin && (
-                                                    <span style={{display: 'flex', gap: '0.4rem'}}>
-                                                        <button type="button" onClick={() => startEditTrustedCompany(client)} title="Edit">✏️</button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => deleteTrustedCompany(client.trustedCompanyId, client.companyName)}
-                                                            disabled={deletingTrustedCompanyId === client.trustedCompanyId}
-                                                            title="Remove"
-                                                        >
-                                                            {deletingTrustedCompanyId === client.trustedCompanyId ? '...' : '🗑️'}
-                                                        </button>
-                                                    </span>
-                                                )}
-                                            </>
-                                        )}
+                            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: '1rem', marginTop: '2rem'}}>
+                                {trustedCompanies.filter((client) => client.logoUrl).map((client) => (
+                                     <div key={client.trustedCompanyId} style={{minHeight: '110px', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'white', border: '1px solid #e5e7eb'}}>
+                                        <img
+                                            src={client.logoUrl.startsWith('http') ? client.logoUrl : `${API_ROOT}${client.logoUrl}`}
+                                            alt={client.companyName}
+                                            loading="lazy"
+                                            style={{display: 'block', maxWidth: '100%', maxHeight: '78px', objectFit: 'contain'}}
+                                        />
                                     </div>
                                 ))}
+                                {trustedCompanies.every((client) => !client.logoUrl) && <p style={{gridColumn: '1/-1', textAlign: 'center', color: '#6b7280'}}>Company logos will appear here.</p>}
                             </div>
                             )}
                         </div>
@@ -2641,7 +2998,7 @@
                     <section id="contact" className="container">
                         <div className="contact-section">
                             <h2>Get In Touch With Us</h2>
-                            <p>Whether you're purchasing for personal use or your business, we're here to help you choose the right products and solutions.</p>
+                            <p>Whether you're purchasing for personal use or your business, we're here to help you choose the right technology solutions.</p>
 
                             {isAdmin && (
                             <div className="category-form" style={{marginBottom: '1.5rem'}}>

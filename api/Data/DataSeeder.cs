@@ -11,6 +11,8 @@ public static class DataSeeder
     {
         await SeedAdminUserAsync(db);
         await SeedContactAsync(db);
+        await SeedAboutContentAsync(db);
+        await SeedHomeContentAsync(db);
         await SeedTrustedCompaniesAsync(db);
         await SeedOffersAsync(db);
 
@@ -89,6 +91,39 @@ public static class DataSeeder
             Email = "info@onesourcesolutionske.com",
             Location = "Office No 7E, 7th Floor, TRV Centre Building, 3rd Avenue Parklands, Nairobi",
             Website = "https://www.onesourcesolutionske.com",
+        });
+
+        await db.SaveChangesAsync();
+    }
+
+    private static async Task SeedAboutContentAsync(AppDbContext db)
+    {
+        var about = await db.AboutContents.FirstOrDefaultAsync(a => a.AboutContentId == 1);
+        if (about is null)
+        {
+            about = new AboutContent { AboutContentId = 1 };
+            db.AboutContents.Add(about);
+        }
+
+        if (string.IsNullOrWhiteSpace(about.Heading))
+            about.Heading = "Technology that helps businesses move forward";
+        if (string.IsNullOrWhiteSpace(about.Description))
+        {
+            about.Description = "OneSource Solutions Limited is a Nairobi-based ICT partner helping businesses work smarter through dependable technology. We bring together business hardware, tax-compliant systems, software, networking, and security solutions, with practical guidance from selection through implementation and ongoing support.\n\nOur team works with organizations across retail, hospitality, healthcare, and other sectors to match the right technology to the way each business operates.";
+        }
+
+        await db.SaveChangesAsync();
+    }
+
+    private static async Task SeedHomeContentAsync(AppDbContext db)
+    {
+        if (await db.HomeContents.AnyAsync()) return;
+
+        db.HomeContents.Add(new HomeContent
+        {
+            HomeContentId = 1,
+            Heading = "Empowering You with the Latest in IT & Technology",
+            Description = "OneSource Solutions Limited is an ICT company providing customized hardware and software solutions to enable vital business processes across varied sectors. As KRA authorized suppliers of Electronic Fiscal Devices and providers of hospitality, payroll, networking, and CCTV solutions, we're your complete technology partner in Nairobi."
         });
 
         await db.SaveChangesAsync();

@@ -12,6 +12,9 @@ namespace OneSource.Api.Models
         [MaxLength(200)]
         public string CompanyName { get; set; } = string.Empty;
 
+        [MaxLength(500)]
+        public string? LogoUrl { get; set; }
+
         public bool IsActive { get; set; } = true;
 
         public DateTime CreatedDate { get; set; }
