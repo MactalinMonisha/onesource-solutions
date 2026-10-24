@@ -10,10 +10,11 @@ Full-stack sales/catalog site for OneSource Solutions Limited (ICT company - TIM
 ## Backend setup (`api/`)
 
 1. Requires .NET SDK and a PostgreSQL database.
-2. Copy `appsettings.json` and fill in your real values:
-   - `ConnectionStrings:DefaultConnection` — your PostgreSQL connection string.
-   - `Jwt:Key` — a long random secret used to sign login tokens (change the placeholder!).
-   - `AllowedOrigins` — add the URL(s) where the frontend is hosted.
+2. Set `ConnectionStrings__DefaultConnection` to your PostgreSQL connection string. Do not put database credentials in the tracked `appsettings.json`. For a local PowerShell session:
+   ```powershell
+   $env:ConnectionStrings__DefaultConnection = "Host=localhost;Port=5432;Database=onesource_db;Username=postgres;Password=<your-password>"
+   ```
+   Set `Jwt:Key` to a long random secret used to sign login tokens, and configure `AllowedOrigins` with the URL(s) where the frontend is hosted.
 3. Run:
    ```
    cd api
