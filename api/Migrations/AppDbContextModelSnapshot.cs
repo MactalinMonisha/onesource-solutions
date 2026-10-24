@@ -83,6 +83,53 @@ namespace OneSource.Api.Migrations
                     b.ToTable("AboutImages");
                 });
 
+            modelBuilder.Entity("OneSource.Api.Models.CarouselSlide", b =>
+                {
+                    b.Property<int>("CarouselSlideId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CarouselSlideId"));
+
+                    b.Property<string>("AltText")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("CarouselSlideId");
+
+                    b.ToTable("CarouselSlides");
+                });
+
             modelBuilder.Entity("OneSource.Api.Models.Contact", b =>
                 {
                     b.Property<int>("ContactId")
@@ -97,6 +144,10 @@ namespace OneSource.Api.Migrations
                     b.Property<string>("Email")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<string>("EnquiryWhatsAppNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("Location")
                         .HasMaxLength(500)
@@ -120,6 +171,51 @@ namespace OneSource.Api.Migrations
                     b.HasKey("ContactId");
 
                     b.ToTable("Contacts");
+                });
+
+            modelBuilder.Entity("OneSource.Api.Models.ContactDetail", b =>
+                {
+                    b.Property<int>("ContactDetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ContactDetailId"));
+
+                    b.Property<int>("ContactId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsEnquiry")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("ContactDetailId");
+
+                    b.HasIndex("ContactId");
+
+                    b.ToTable("ContactDetails");
                 });
 
             modelBuilder.Entity("OneSource.Api.Models.HomeContent", b =>
@@ -198,6 +294,10 @@ namespace OneSource.Api.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("ProductCode")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<string>("ProductDescription")
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
@@ -213,6 +313,9 @@ namespace OneSource.Api.Migrations
                     b.HasKey("ProductId");
 
                     b.HasIndex("CatId");
+
+                    b.HasIndex("ProductCode")
+                        .IsUnique();
 
                     b.ToTable("Products");
                 });
@@ -359,6 +462,17 @@ namespace OneSource.Api.Migrations
                     b.Navigation("AboutContent");
                 });
 
+            modelBuilder.Entity("OneSource.Api.Models.ContactDetail", b =>
+                {
+                    b.HasOne("OneSource.Api.Models.Contact", "Contact")
+                        .WithMany("Details")
+                        .HasForeignKey("ContactId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contact");
+                });
+
             modelBuilder.Entity("OneSource.Api.Models.Product", b =>
                 {
                     b.HasOne("OneSource.Api.Models.ProductCategory", "Category")
@@ -384,6 +498,11 @@ namespace OneSource.Api.Migrations
             modelBuilder.Entity("OneSource.Api.Models.AboutContent", b =>
                 {
                     b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("OneSource.Api.Models.Contact", b =>
+                {
+                    b.Navigation("Details");
                 });
 
             modelBuilder.Entity("OneSource.Api.Models.Product", b =>

@@ -11,3 +11,8 @@ public record CreateProductCategoryDto(
     string CatName,
     string? Description
 );
+
+public record UpdateProductCategoryDto(
+    string CatName,
+    string? Description
+);

@@ -116,6 +116,14 @@
             line-height: 1.1;
         }
 
+        .image-carousel-caption p {
+            margin-top: 0.75rem;
+            max-width: 560px;
+            color: rgba(255, 255, 255, 0.92);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
         .carousel-controls {
             position: absolute;
             z-index: 2;
@@ -331,6 +339,11 @@
             color: var(--text) !important;
             padding-left: 1.5rem;
             transform: translateX(3px);
+        }
+
+        .dropdown-menu a.active {
+            background: rgba(29, 78, 216, 0.12);
+            font-weight: 600;
         }
 
         .hero {
@@ -742,9 +755,15 @@
 
         .product-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 2rem;
             margin-top: 2rem;
+        }
+
+        @media (max-width: 700px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .product-card {
@@ -824,7 +843,8 @@
         }
 
         .category-form input,
-        .category-form select {
+        .category-form select,
+        .category-form textarea {
             width: 100%;
             padding: 0.7rem 0.8rem;
             border: 1px solid #d1d5db;
@@ -834,9 +854,15 @@
         }
 
         .category-form input:focus,
-        .category-form select:focus {
+        .category-form select:focus,
+        .category-form textarea:focus {
             outline: 2px solid rgba(29, 78, 216, 0.25);
             border-color: var(--brand-blue);
+        }
+
+        .category-form textarea {
+            min-height: 110px;
+            resize: vertical;
         }
 
         .category-form-message {
@@ -1202,11 +1228,42 @@
 
     <script type="text/babel">
         function SalesPage() {
+            const defaultImageSlides = [
+                {
+                    imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=2000&q=85',
+                    altText: 'Rows of server racks in a modern data center',
+                    label: 'Reliable infrastructure',
+                    description: 'Dependable technology and infrastructure to keep your business connected.',
+                    title: 'Technology built for business'
+                },
+                {
+                    imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=2000&q=85',
+                    altText: 'Close-up of modern computer components and circuit board',
+                    label: 'Hardware and systems',
+                    description: 'Business-ready hardware and systems selected to support your day-to-day work.',
+                    title: 'The right tools for every workday'
+                },
+                {
+                    imageUrl: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=2000&q=85',
+                    altText: 'Bright, connected modern office workspace',
+                    label: 'Support that stays with you',
+                    description: 'Practical guidance and ongoing support from setup through everyday use.',
+                    title: 'A practical partner for your next step'
+                }
+            ];
             const [activeTab, setActiveTab] = React.useState('all');
             const [imageSlide, setImageSlide] = React.useState(0);
+            const [imageSlides, setImageSlides] = React.useState(defaultImageSlides);
+            const [showCarouselForm, setShowCarouselForm] = React.useState(false);
+            const [editingProductImages, setEditingProductImages] = React.useState([]);
+            const [carouselDraft, setCarouselDraft] = React.useState([]);
+            const [carouselSubmitting, setCarouselSubmitting] = React.useState(false);
+            const [carouselMessage, setCarouselMessage] = React.useState(null);
+            const [uploadingCarouselImageIndex, setUploadingCarouselImageIndex] = React.useState(null);
             const [products, setProducts] = React.useState([]);
             const [loading, setLoading] = React.useState(true);
             const [error, setError] = React.useState(null);
+            const [adminCatalogView, setAdminCatalogView] = React.useState('list');
             const [deletingProductId, setDeletingProductId] = React.useState(null);
             const [productMessage, setProductMessage] = React.useState(null);
             const [showCategoryForm, setShowCategoryForm] = React.useState(false);
@@ -1215,15 +1272,24 @@
             const [categorySubmitting, setCategorySubmitting] = React.useState(false);
             const [categoryMessage, setCategoryMessage] = React.useState(null);
             const [deletingCategoryId, setDeletingCategoryId] = React.useState(null);
+            const [editingCategoryId, setEditingCategoryId] = React.useState(null);
+            const [editingCategoryName, setEditingCategoryName] = React.useState('');
+            const [editingCategoryDescription, setEditingCategoryDescription] = React.useState('');
             const [categories, setCategories] = React.useState([]);
             const [categoriesLoading, setCategoriesLoading] = React.useState(true);
             const [categoriesError, setCategoriesError] = React.useState(null);
             const [showProductForm, setShowProductForm] = React.useState(false);
+            const [editingProductId, setEditingProductId] = React.useState(null);
             const [productFormCatId, setProductFormCatId] = React.useState(null);
             const [newProductName, setNewProductName] = React.useState('');
             const [newProductDescription, setNewProductDescription] = React.useState('');
+            const [newProductCode, setNewProductCode] = React.useState('');
             const [productSubmitting, setProductSubmitting] = React.useState(false);
             const [addProductMessage, setAddProductMessage] = React.useState(null);
+            const [catalogRevision, setCatalogRevision] = React.useState(0);
+            const [spreadsheetFile, setSpreadsheetFile] = React.useState(null);
+            const [spreadsheetSubmitting, setSpreadsheetSubmitting] = React.useState(false);
+            const [spreadsheetMessage, setSpreadsheetMessage] = React.useState(null);
             const [uploadingImagesForId, setUploadingImagesForId] = React.useState(null);
             const [imageIndexByProduct, setImageIndexByProduct] = React.useState({});
             const [deletingImageId, setDeletingImageId] = React.useState(null);
@@ -1231,11 +1297,7 @@
             const [contact, setContact] = React.useState(null);
             const [contactLoading, setContactLoading] = React.useState(true);
             const [showContactForm, setShowContactForm] = React.useState(false);
-            const [contactPhone, setContactPhone] = React.useState('');
-            const [contactWhatsApp, setContactWhatsApp] = React.useState('');
-            const [contactEmail, setContactEmail] = React.useState('');
-            const [contactLocation, setContactLocation] = React.useState('');
-            const [contactWebsite, setContactWebsite] = React.useState('');
+            const [contactDetails, setContactDetails] = React.useState([]);
             const [contactSubmitting, setContactSubmitting] = React.useState(false);
             const [contactMessage, setContactMessage] = React.useState(null);
 
@@ -1283,33 +1345,12 @@
             const isLoggedIn = !!authToken;
             const isAdmin = isLoggedIn && authRole === 'Admin';
 
-            const imageSlides = [
-                {
-                    image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=2000&q=85',
-                    alt: 'Rows of server racks in a modern data center',
-                    label: 'Reliable infrastructure',
-                    title: 'Technology built for business'
-                },
-                {
-                    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=2000&q=85',
-                    alt: 'Close-up of modern computer components and circuit board',
-                    label: 'Hardware and systems',
-                    title: 'The right tools for every workday'
-                },
-                {
-                    image: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=2000&q=85',
-                    alt: 'Bright, connected modern office workspace',
-                    label: 'Support that stays with you',
-                    title: 'A practical partner for your next step'
-                }
-            ];
-
             React.useEffect(() => {
                 const timer = window.setInterval(() => {
                     setImageSlide((current) => (current + 1) % imageSlides.length);
                 }, 5500);
                 return () => window.clearInterval(timer);
-            }, []);
+            }, [imageSlides.length]);
 
             const moveImageSlide = (direction) => {
                 setImageSlide((current) => (current + direction + imageSlides.length) % imageSlides.length);
@@ -1321,6 +1362,109 @@
             const API_BASE = window.ONESOURCE_API_BASE || (isLocalPreview ? 'http://localhost:5055/api' : 'https://onesource-api.onrender.com/api');
             const API_ROOT = API_BASE.replace(/\/api$/, '');
             const CATEGORY_API_URL = `${API_BASE}/ProductCategories`;
+
+            const loadCarouselSlides = async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/Carousel`);
+                    if (!response.ok) throw new Error(`Request failed (${response.status})`);
+                    const result = await response.json();
+                    if (!Array.isArray(result) || result.length === 0) throw new Error('The carousel response was invalid.');
+                    setImageSlides(result);
+                    setImageSlide(0);
+                } catch (err) {
+                    console.error('Failed to load carousel slides', err);
+                }
+            };
+
+            React.useEffect(() => {
+                loadCarouselSlides();
+            }, []);
+
+            const updateCarouselDraft = (index, field, value) => {
+                setCarouselDraft(slides => slides.map((slide, slideIndex) =>
+                    slideIndex === index ? { ...slide, [field]: value } : slide
+                ));
+            };
+
+            const uploadCarouselImage = async (index, file) => {
+                if (!file) return;
+                setUploadingCarouselImageIndex(index);
+                setCarouselMessage(null);
+
+                try {
+                    const formData = new FormData();
+                    formData.append('image', file);
+                    const response = await fetch(`${API_BASE}/Carousel/upload-image`, {
+                        method: 'POST',
+                        headers: { ...authHeaders() },
+                        body: formData
+                    });
+
+                    if (response.status === 401 || response.status === 403)
+                        throw new Error('You must be logged in as Admin to upload carousel images.');
+                    if (!response.ok)
+                        throw new Error(await response.text() || `Request failed (${response.status})`);
+
+                    const result = await response.json();
+                    if (!result.imageUrl) throw new Error('The upload response did not contain an image URL.');
+                    updateCarouselDraft(index, 'imageUrl', result.imageUrl);
+                    setCarouselMessage({ type: 'success', text: `Image for slide ${index + 1} uploaded.` });
+                } catch (err) {
+                    setCarouselMessage({ type: 'error', text: `Could not upload carousel image: ${err.message}` });
+                } finally {
+                    setUploadingCarouselImageIndex(null);
+                }
+            };
+
+            const addCarouselSlide = () => {
+                setCarouselDraft(slides => [
+                    ...slides,
+                    { imageUrl: '', altText: '', label: '', description: '', title: '' }
+                ]);
+            };
+
+            const saveCarouselSlides = async (event) => {
+                event.preventDefault();
+                setCarouselSubmitting(true);
+                setCarouselMessage(null);
+
+                try {
+                    const response = await fetch(`${API_BASE}/Carousel`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                        body: JSON.stringify(carouselDraft.map(({ imageUrl, altText, label, description, title }) => ({
+                            imageUrl: imageUrl.trim(),
+                            altText: altText.trim(),
+                            label: label.trim(),
+                            description: description.trim(),
+                            title: title.trim()
+                        })))
+                    });
+
+                    if (response.status === 401 || response.status === 403)
+                        throw new Error('You must be logged in as Admin to update the carousel.');
+                    if (!response.ok) throw new Error(`Request failed (${response.status}): ${await response.text()}`);
+
+                    const result = await response.json();
+                    setImageSlides(result);
+                    setCarouselDraft(result);
+                    setImageSlide(0);
+                    setShowCarouselForm(false);
+                    setCarouselMessage({ type: 'success', text: 'Carousel slides updated successfully.' });
+                } catch (err) {
+                    setCarouselMessage({ type: 'error', text: `Could not update carousel: ${err.message}` });
+                } finally {
+                    setCarouselSubmitting(false);
+                }
+            };
+
+            const openCarouselEditor = () => {
+                setCarouselDraft(imageSlides.map(({ imageUrl, altText, label, description, title }) => ({
+                    imageUrl, altText, label, description, title
+                })));
+                setCarouselMessage(null);
+                setShowCarouselForm(true);
+            };
 
             const loadHomeContent = async () => {
                 try {
@@ -1364,6 +1508,17 @@
                 loadCategories();
             }, []);
 
+            const isCategoryActive = (categoryName) => {
+                const normalizedName = categoryName.toLowerCase();
+                const category = categories.find(item =>
+                    String(item.catName || item.name || item.categoryName || '').toLowerCase() === normalizedName
+                );
+                const categoryId = category?.cateId ?? category?.id ?? category?.categoryId ?? category?.catId;
+
+                return String(activeTab).toLowerCase() === normalizedName
+                    || (categoryId != null && String(activeTab) === String(categoryId));
+            };
+
             const loadContact = async () => {
                 setContactLoading(true);
                 try {
@@ -1371,11 +1526,21 @@
                     if (!response.ok) throw new Error(`Request failed (${response.status})`);
                     const result = await response.json();
                     setContact(result);
-                    setContactPhone(result.phone || '');
-                    setContactWhatsApp(result.whatsApp || '');
-                    setContactEmail(result.email || '');
-                    setContactLocation(result.location || '');
-                    setContactWebsite(result.website || '');
+                    const details = Array.isArray(result.details) && result.details.length
+                        ? result.details
+                        : [
+                            { label: 'Phone', value: result.phone, type: 'phone', isEnquiry: false },
+                            { label: 'WhatsApp', value: result.whatsApp, type: 'whatsapp', isEnquiry: true },
+                            { label: 'Email', value: result.email, type: 'email', isEnquiry: false },
+                            { label: 'Location', value: result.location, type: 'address', isEnquiry: false },
+                            { label: 'Website', value: result.website, type: 'website', isEnquiry: false }
+                        ].filter(detail => detail.value);
+                    const eligibleEnquiryDetail = details.find(detail => detail.isEnquiry);
+                    setContactDetails(details.map((detail, index) => ({
+                        ...detail,
+                        isEnquiry: eligibleEnquiryDetail === detail,
+                        clientKey: detail.contactDetailId || `contact-${index}`
+                    })));
                 } catch (err) {
                     console.error('Failed to load contact info', err);
                 } finally {
@@ -1386,6 +1551,78 @@
             React.useEffect(() => {
                 loadContact();
             }, []);
+
+            const addContactDetail = () => {
+                setContactDetails(details => [
+                    ...details,
+                    { clientKey: `new-${Date.now()}`, label: 'New link', value: '', type: 'link' }
+                ]);
+            };
+
+            const updateContactDetail = (index, field, value) => {
+                setContactDetails(details => details.map((detail, detailIndex) =>
+                    detailIndex === index
+                        ? {
+                            ...detail,
+                            [field]: value,
+                            ...(field === 'type' && !['phone', 'whatsapp', 'email'].includes(value) ? { isEnquiry: false } : {})
+                        }
+                        : detail
+                ));
+            };
+
+            const removeContactDetail = (index) => {
+                const detail = contactDetails[index];
+                if (detail.type === 'whatsapp') {
+                    const selected = detail.isEnquiry;
+                    const warning = selected
+                        ? `This WhatsApp number (${detail.value}) is currently selected for product enquiries. If you remove it, this number will be kept in the database and continue to receive enquiries. Continue?`
+                        : `This WhatsApp number (${detail.value}) may be used as the fallback for product enquiries. If you remove it, it will be kept in the database and continue to receive enquiries when no other enquiry method is selected. Continue?`;
+                    if (!window.confirm(warning)) return;
+                }
+
+                setContactDetails(details => details
+                    .filter((_, detailIndex) => detailIndex !== index)
+                    .map(item => detail.isEnquiry ? { ...item, isEnquiry: false } : item));
+            };
+
+            const getContactDetailHref = (detail) => {
+                const value = (detail.value || '').trim();
+                if (!value) return null;
+
+                switch (detail.type) {
+                    case 'email':
+                        return `mailto:${value}`;
+                    case 'phone':
+                        return `tel:${value}`;
+                    case 'whatsapp': {
+                        const number = value.replace(/[^0-9]/g, '');
+                        return number ? `https://wa.me/${number}` : null;
+                    }
+                    case 'address':
+                        return `https://maps.google.com/?q=${encodeURIComponent(value)}`;
+                    case 'website':
+                    case 'link':
+                        try {
+                            const url = new URL(/^https?:\/\//i.test(value) ? value : `https://${value}`);
+                            return ['http:', 'https:'].includes(url.protocol) ? url.href : null;
+                        } catch {
+                            return null;
+                        }
+                    default:
+                        return null;
+                }
+            };
+
+            const getContactDetailIcon = (type) => ({
+                email: '📧',
+                phone: '☎️',
+                whatsapp: '📱',
+                address: '📍',
+                website: '🌐',
+                link: '🔗',
+                text: '📮'
+            }[type] || '🔗');
 
             const loadTrustedCompanies = async () => {
                 setTrustedCompaniesLoading(true);
@@ -1426,22 +1663,76 @@
             }, []);
 
             React.useEffect(() => {
-                const categoryId = activeTab === 'all' ? 0 : activeTab;
+                const controller = new AbortController();
+                const categoryName = typeof activeTab === 'string' && activeTab !== 'all' && !/^\d+$/.test(activeTab);
+                if (categoryName && categoriesLoading) return;
+
+                const selectedCategory = categories.find(category =>
+                    String(category.catName || category.name || category.categoryName || '').toLowerCase() === String(activeTab).toLowerCase()
+                );
+                if (categoryName && !selectedCategory) {
+                    setProducts([]);
+                    setError(`Category "${activeTab}" is unavailable.`);
+                    setLoading(false);
+                    return;
+                }
+
+                const categoryId = activeTab === 'all'
+                    ? 0
+                    : selectedCategory?.cateId || selectedCategory?.id || selectedCategory?.categoryId || selectedCategory?.catId || activeTab;
                 const url = `${API_BASE}/Products/by-category/${categoryId}`;
 
                 setLoading(true);
-                fetch(url)
-                    .then(res => { if (!res.ok) throw new Error('Failed to fetch products'); return res.json(); })
-                    .then(data => { setProducts(data); setLoading(false); })
-                    .catch(err => { setError(err.message); setLoading(false); });
-            }, [activeTab]);
+                setError(null);
+                fetch(url, { signal: controller.signal })
+                    .then(res => {
+                        if (!res.ok) throw new Error(`Failed to fetch products (${res.status})`);
+                        return res.json();
+                    })
+                    .then(data => {
+                        if (!Array.isArray(data)) throw new Error('The products response was invalid.');
+                        if (!controller.signal.aborted) setProducts(data);
+                    })
+                    .catch(err => {
+                        if (!controller.signal.aborted && err.name !== 'AbortError') {
+                            setError(err.message);
+                            setProducts([]);
+                        }
+                    })
+                    .finally(() => {
+                        if (!controller.signal.aborted) setLoading(false);
+                    });
 
-            const sendWhatsAppMessage = (productName) => {
+                return () => controller.abort();
+            }, [activeTab, categories, categoriesLoading, catalogRevision]);
+
+            const sendProductEnquiry = (productName) => {
                 const message = `Hi! I'm interested in enquiring about "${productName}". Could you please provide more details about this solution? Thank you!`;
-                const encodedMessage = encodeURIComponent(message);
-                const waNumber = (contact?.whatsApp || '+254735610610').replace(/[^0-9]/g, '');
-                const whatsappURL = `https://wa.me/${waNumber}?text=${encodedMessage}`;
-                window.open(whatsappURL, '_blank');
+                const selectedMethod = contactDetails.find(detail => detail.isEnquiry);
+                const whatsappNumber = selectedMethod?.type === 'whatsapp'
+                    ? selectedMethod.value
+                    : (!selectedMethod ? contact?.enquiryWhatsAppNumber || contact?.whatsApp : null);
+
+                if (whatsappNumber) {
+                    const waNumber = whatsappNumber.replace(/[^0-9]/g, '');
+                    if (waNumber) {
+                        window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`, '_blank');
+                        return;
+                    }
+                }
+
+                if (selectedMethod?.type === 'email' || (!selectedMethod && contact?.email)) {
+                    const email = selectedMethod?.value || contact.email;
+                    window.location.href = `mailto:${email}?subject=${encodeURIComponent(`Product enquiry: ${productName}`)}&body=${encodeURIComponent(message)}`;
+                    return;
+                }
+
+                if (selectedMethod?.type === 'phone') {
+                    window.location.href = `tel:${selectedMethod.value}`;
+                    return;
+                }
+
+                document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
             };
 
             const login = async (event) => {
@@ -1523,8 +1814,10 @@
 
                     setCategoryName('');
                     setCategoryDescription('');
+                    setShowCategoryForm(false);
+                    setAdminCatalogView('list');
                     setCategoryMessage({ type: 'success', text: 'Category added successfully.' });
-                    loadCategories();
+                    await loadCategories();
                 } catch (err) {
                     setCategoryMessage({ type: 'error', text: `Could not add category: ${err.message}` });
                 } finally {
@@ -1566,6 +1859,72 @@
                 }
             };
 
+            const openCategoryEditor = (category) => {
+                setAdminCatalogView('detail');
+                setShowCategoryForm(false);
+                setShowProductForm(false);
+                setEditingCategoryId(category.cateId || category.id || category.categoryId || category.catId);
+                setEditingCategoryName(category.catName || category.name || category.categoryName || '');
+                setEditingCategoryDescription(category.description || '');
+                setCategoryMessage(null);
+            };
+
+            const openNewCategoryForm = () => {
+                setAdminCatalogView('detail');
+                setEditingCategoryId(null);
+                setEditingCategoryName('');
+                setEditingCategoryDescription('');
+                setShowProductForm(false);
+                setShowCategoryForm(true);
+                setCategoryMessage(null);
+            };
+
+            const closeCatalogDetail = () => {
+                setAdminCatalogView('list');
+                setShowCategoryForm(false);
+                setShowProductForm(false);
+                setEditingCategoryId(null);
+                setEditingProductId(null);
+                setEditingProductImages([]);
+                setCategoryMessage(null);
+                setAddProductMessage(null);
+            };
+
+            const updateCategory = async (event) => {
+                event.preventDefault();
+                if (!editingCategoryName.trim()) {
+                    setCategoryMessage({ type: 'error', text: 'Category name is required.' });
+                    return;
+                }
+
+                setCategorySubmitting(true);
+                setCategoryMessage(null);
+                try {
+                    const response = await fetch(`${CATEGORY_API_URL}/${editingCategoryId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                        body: JSON.stringify({
+                            catName: editingCategoryName.trim(),
+                            description: editingCategoryDescription.trim()
+                        })
+                    });
+                    if (response.status === 401 || response.status === 403)
+                        throw new Error('You must be logged in as Admin to edit a category.');
+                    if (!response.ok)
+                        throw new Error(`${response.status === 409 ? 'A category with that name already exists.' : `Request failed (${response.status})`}`);
+
+                    setCategoryMessage({ type: 'success', text: 'Category updated successfully.' });
+                    setEditingCategoryId(null);
+                    setAdminCatalogView('list');
+                    await loadCategories();
+                    setCatalogRevision(revision => revision + 1);
+                } catch (err) {
+                    setCategoryMessage({ type: 'error', text: `Could not update category: ${err.message}` });
+                } finally {
+                    setCategorySubmitting(false);
+                }
+            };
+
             const updateContact = async (event) => {
                 event.preventDefault();
 
@@ -1577,11 +1936,12 @@
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json', ...authHeaders() },
                         body: JSON.stringify({
-                            phone: contactPhone.trim(),
-                            whatsApp: contactWhatsApp.trim(),
-                            email: contactEmail.trim(),
-                            location: contactLocation.trim(),
-                            website: contactWebsite.trim()
+                            details: contactDetails.map(({ label, value, type, isEnquiry }) => ({
+                                label: label.trim(),
+                                value: value.trim(),
+                                type,
+                                isEnquiry
+                            }))
                         })
                     });
 
@@ -1594,6 +1954,10 @@
 
                     const result = await response.json();
                     setContact(result);
+                    setContactDetails((result.details || []).map((detail, index) => ({
+                        ...detail,
+                        clientKey: detail.contactDetailId || `contact-${index}`
+                    })));
                     setContactMessage({ type: 'success', text: 'Contact details updated successfully.' });
                     setShowContactForm(false);
                 } catch (err) {
@@ -1853,12 +2217,18 @@
                 }
             };
 
-            const openProductForm = (catId) => {
-                setProductFormCatId(catId);
+            const openProductForm = (catId, product = null) => {
+                setAdminCatalogView('detail');
+                setShowCategoryForm(false);
+                setEditingProductId(product ? (product.productId || product.id) : null);
+                setProductFormCatId(product ? (product.catId || catId) : (catId || null));
                 setShowProductForm(true);
-                setNewProductName('');
-                setNewProductDescription('');
+                setNewProductName(product ? (product.productName || product.name || '') : '');
+                setNewProductDescription(product ? (product.productDescription || product.description || '') : '');
+                setNewProductCode(product ? (product.productCode || '') : '');
+                setEditingProductImages(product && Array.isArray(product.productImages) ? product.productImages : []);
                 setAddProductMessage(null);
+                setProductMessage(null);
             };
 
             const addProduct = async (event) => {
@@ -1879,36 +2249,102 @@
                 setAddProductMessage(null);
 
                 try {
-                    const response = await fetch(`${API_BASE}/Products`, {
-                        method: 'POST',
+                    const isEditing = editingProductId !== null;
+                    const response = await fetch(isEditing ? `${API_BASE}/Products/${editingProductId}` : `${API_BASE}/Products`, {
+                        method: isEditing ? 'PUT' : 'POST',
                         headers: { 'Content-Type': 'application/json', ...authHeaders() },
                         body: JSON.stringify({
                             productName: trimmedName,
                             productDescription: newProductDescription.trim(),
-                            catId: productFormCatId
+                            productCode: newProductCode.trim() || null,
+                            catId: productFormCatId,
+                            isActive: true
                         })
                     });
 
                     if (response.status === 401 || response.status === 403) {
-                        throw new Error('You must be logged in as Admin to add a product.');
+                        throw new Error(`You must be logged in as Admin to ${isEditing ? 'edit' : 'add'} a product.`);
                     }
                     if (!response.ok) {
-                        throw new Error(`Request failed (${response.status})`);
+                        throw new Error(`${response.status === 409 ? 'That product code is already in use.' : `Request failed (${response.status})`}`);
                     }
 
-                    const createdProduct = await response.json();
-
-                    if (activeTab === 0 || activeTab === 'all' || activeTab === productFormCatId) {
-                        setProducts(prev => [...prev, createdProduct]);
-                    }
+                    if (!isEditing) await response.json();
 
                     setNewProductName('');
                     setNewProductDescription('');
-                    setAddProductMessage({ type: 'success', text: 'Product added successfully.' });
+                    setNewProductCode('');
+                    setAddProductMessage({ type: 'success', text: `Product ${isEditing ? 'updated' : 'added'} successfully.` });
+                    setEditingProductImages([]);
+                    setShowProductForm(false);
+                    setEditingProductId(null);
+                    setAdminCatalogView('list');
+                    setCatalogRevision(revision => revision + 1);
                 } catch (err) {
-                    setAddProductMessage({ type: 'error', text: `Could not add product: ${err.message}` });
+                    setAddProductMessage({ type: 'error', text: `Could not save product: ${err.message}` });
                 } finally {
                     setProductSubmitting(false);
+                }
+            };
+
+            const downloadSpreadsheet = async (endpoint, filename) => {
+                setSpreadsheetSubmitting(true);
+                setSpreadsheetMessage(null);
+                try {
+                    const response = await fetch(`${API_BASE}/Products/${endpoint}`, { headers: { ...authHeaders() } });
+                    if (response.status === 401 || response.status === 403)
+                        throw new Error('You must be logged in as Admin to download product spreadsheets.');
+                    if (!response.ok) throw new Error(`Request failed (${response.status})`);
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    URL.revokeObjectURL(url);
+                    setSpreadsheetMessage({ type: 'success', text: `${filename} downloaded.` });
+                } catch (err) {
+                    setSpreadsheetMessage({ type: 'error', text: `Could not download spreadsheet: ${err.message}` });
+                } finally {
+                    setSpreadsheetSubmitting(false);
+                }
+            };
+
+            const importSpreadsheet = async (event) => {
+                event.preventDefault();
+                if (!spreadsheetFile) {
+                    setSpreadsheetMessage({ type: 'error', text: 'Choose an .xlsx file to import.' });
+                    return;
+                }
+
+                setSpreadsheetSubmitting(true);
+                setSpreadsheetMessage(null);
+                try {
+                    const formData = new FormData();
+                    formData.append('file', spreadsheetFile);
+                    const response = await fetch(`${API_BASE}/Products/import`, {
+                        method: 'POST',
+                        headers: { ...authHeaders() },
+                        body: formData
+                    });
+                    if (response.status === 401 || response.status === 403)
+                        throw new Error('You must be logged in as Admin to import products.');
+                    if (!response.ok)
+                        throw new Error(await response.text() || `Request failed (${response.status})`);
+                    const result = await response.json();
+                    setSpreadsheetMessage({
+                        type: 'success',
+                        text: `Import complete: ${result.created} products added, ${result.updated} updated, ${result.categoriesCreated} categories created.`
+                    });
+                    setSpreadsheetFile(null);
+                    await loadCategories();
+                    setCatalogRevision(revision => revision + 1);
+                } catch (err) {
+                    setSpreadsheetMessage({ type: 'error', text: `Could not import spreadsheet: ${err.message}` });
+                } finally {
+                    setSpreadsheetSubmitting(false);
                 }
             };
 
@@ -1940,6 +2376,8 @@
                     setProducts(prev => prev.map(p => (
                         (p.productId || p.id) === productId ? { ...p, productImages: updatedProduct.productImages } : p
                     )));
+                    if (Number(editingProductId) === Number(productId))
+                        setEditingProductImages(updatedProduct.productImages || []);
 
                     // Jump to the newly uploaded image(s) so the user sees the result immediately
                     setImageIndexByProduct(prev => ({
@@ -1989,6 +2427,8 @@
                         const remainingImages = (p.productImages || []).filter(img => (img.productImageId || img.id) !== imageId);
                         return { ...p, productImages: remainingImages };
                     }));
+                    if (Number(editingProductId) === Number(productId))
+                        setEditingProductImages(prev => prev.filter(img => (img.productImageId || img.id) !== imageId));
 
                     setImageIndexByProduct(prev => ({ ...prev, [productId]: 0 }));
                     setProductMessage({ type: 'success', text: 'Image deleted successfully.' });
@@ -2055,11 +2495,24 @@
                                             Solutions <span>▼</span>
                                         </button>
                                         <div className="dropdown-menu">
-                                            <a href="#solutions" onClick={() => setActiveTab('tims')}>TIMS</a>
-                                            <a href="#solutions" onClick={() => setActiveTab('etims')}>eTIMS</a>
-                                            <a href="#solutions" onClick={() => setActiveTab('pos')}>POS Hardware</a>
-                                            <a href="#solutions" onClick={() => setActiveTab('it')}>IT Hardware</a>
-                                            <a href="#solutions" onClick={() => setActiveTab('security')}>Security</a>
+                                            {categories.map((category, index) => {
+                                                const categoryName = category.catName || category.name || category.categoryName;
+                                                const categoryId = category.cateId ?? category.id ?? category.categoryId ?? category.catId ?? index;
+
+                                                if (!categoryName) return null;
+
+                                                return (
+                                                    <a
+                                                        key={categoryId}
+                                                        href="#solutions"
+                                                        className={isCategoryActive(categoryName) ? 'active' : ''}
+                                                        aria-current={isCategoryActive(categoryName) ? 'page' : undefined}
+                                                        onClick={() => setActiveTab(categoryId)}
+                                                    >
+                                                        {categoryName}
+                                                    </a>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 </li>
@@ -2145,11 +2598,12 @@
 
                     <section className="image-carousel" aria-label="OneSource Solutions highlights">
                         {imageSlides.map((slide, index) => (
-                            <div className={`image-carousel-slide${imageSlide === index ? ' active' : ''}`} key={slide.image} aria-hidden={imageSlide !== index}>
-                                <img src={slide.image} alt={slide.alt} />
+                            <div className={`image-carousel-slide${imageSlide === index ? ' active' : ''}`} key={slide.carouselSlideId || slide.imageUrl} aria-hidden={imageSlide !== index}>
+                                <img src={slide.imageUrl?.startsWith('http') ? slide.imageUrl : `${API_ROOT}${slide.imageUrl}`} alt={slide.altText} />
                                 <div className="image-carousel-caption">
                                     <span>{slide.label}</span>
                                     <h2>{slide.title}</h2>
+                                    <p>{slide.description}</p>
                                 </div>
                             </div>
                         ))}
@@ -2158,7 +2612,7 @@
                             <div className="carousel-dots">
                                 {imageSlides.map((slide, index) => (
                                     <button
-                                        key={slide.image}
+                                        key={slide.carouselSlideId || slide.imageUrl}
                                         type="button"
                                         className="carousel-dot"
                                         aria-label={`Show image ${index + 1}`}
@@ -2169,7 +2623,87 @@
                             </div>
                             <button type="button" className="carousel-arrow" onClick={() => moveImageSlide(1)} aria-label="Next image">›</button>
                         </div>
+                        {isAdmin && (
+                            <div className="container" style={{position: 'absolute', zIndex: 3, right: '1rem', bottom: '1rem', width: 'auto'}}>
+                                <button
+                                    type="button"
+                                    className="enquire-btn"
+                                    onClick={openCarouselEditor}
+                                >
+                                    Edit Carousel
+                                </button>
+                            </div>
+                        )}
                     </section>
+
+                    {isAdmin && showCarouselForm && (
+                        <div
+                            role="dialog"
+                            aria-modal="true"
+                            aria-label="Edit carousel"
+                            onClick={() => setShowCarouselForm(false)}
+                            style={{
+                                position: 'fixed',
+                                inset: 0,
+                                zIndex: 2000,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                padding: '1rem',
+                                background: 'rgba(15, 23, 42, 0.62)'
+                            }}
+                        >
+                            <form
+                                onSubmit={saveCarouselSlides}
+                                onClick={event => event.stopPropagation()}
+                                className="category-form"
+                                style={{width: 'min(760px, 100%)', maxWidth: '760px', maxHeight: '90vh', overflowY: 'auto', margin: 0, textAlign: 'left'}}
+                            >
+                                <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', marginBottom: '1rem'}}>
+                                    <h2 style={{margin: 0}}>Edit Carousel</h2>
+                                    <button type="button" className="enquire-btn" style={{background: '#64748b'}} onClick={() => setShowCarouselForm(false)}>
+                                        Close
+                                    </button>
+                                </div>
+                                {carouselDraft.map((slide, index) => (
+                                    <div key={index} style={{display: 'grid', gap: '0.5rem', borderBottom: '1px solid #d1d5db', paddingBottom: '1rem', marginBottom: '1rem'}}>
+                                        <strong>Slide {index + 1}</strong>
+                                        <label>Image URL<input type="url" value={slide.imageUrl} onChange={event => updateCarouselDraft(index, 'imageUrl', event.target.value)} maxLength="1000" required placeholder="https://example.com/image.jpg" /></label>
+                                        <label>
+                                            Or upload an image from this device
+                                            <input
+                                                type="file"
+                                                accept="image/jpeg,image/png,image/webp,image/gif"
+                                                disabled={uploadingCarouselImageIndex === index}
+                                                onChange={(event) => {
+                                                    uploadCarouselImage(index, event.target.files?.[0]);
+                                                    event.target.value = '';
+                                                }}
+                                            />
+                                        </label>
+                                        {uploadingCarouselImageIndex === index && <span role="status">Uploading image...</span>}
+                                        {slide.imageUrl && (
+                                            <img
+                                                src={slide.imageUrl.startsWith('http') ? slide.imageUrl : `${API_ROOT}${slide.imageUrl}`}
+                                                alt={`Preview for slide ${index + 1}`}
+                                                style={{width: '100%', maxHeight: '180px', objectFit: 'cover', borderRadius: '8px'}}
+                                            />
+                                        )}
+                                        <label>Image description (alt text)<input type="text" value={slide.altText} onChange={event => updateCarouselDraft(index, 'altText', event.target.value)} maxLength="250" required /></label>
+                                        <label>Caption label<input type="text" value={slide.label} onChange={event => updateCarouselDraft(index, 'label', event.target.value)} maxLength="120" required /></label>
+                                        <label>Caption description<textarea value={slide.description} onChange={event => updateCarouselDraft(index, 'description', event.target.value)} maxLength="500" rows="3" required /></label>
+                                        <label>Caption title<input type="text" value={slide.title} onChange={event => updateCarouselDraft(index, 'title', event.target.value)} maxLength="200" required /></label>
+                                        <button type="button" className="enquire-btn" style={{background: '#dc2626', justifySelf: 'start'}} onClick={() => setCarouselDraft(slides => slides.filter((_, slideIndex) => slideIndex !== index))}>Remove slide</button>
+                                    </div>
+                                ))}
+                                <div style={{display: 'flex', gap: '0.75rem', flexWrap: 'wrap'}}>
+                                    <button type="button" className="enquire-btn" onClick={addCarouselSlide} disabled={carouselDraft.length >= 10}>Add slide</button>
+                                    <button type="submit" className="enquire-btn" disabled={carouselSubmitting || carouselDraft.length === 0}>{carouselSubmitting ? 'Saving...' : 'Save carousel'}</button>
+                                </div>
+                                {carouselMessage && <p className={`category-form-message ${carouselMessage.type}`} role="status">{carouselMessage.text}</p>}
+                            </form>
+                        </div>
+                    )}
 
                     <section className="hero">
                         <div className="hero-content">
@@ -2370,20 +2904,126 @@
                             <h2 className="section-title">Our Solutions</h2>
 
                             {isAdmin && (
-                            <div className="category-form">
-                                <button
-                                    type="button"
-                                    className="enquire-btn"
-                                    onClick={() => {
-                                        setShowCategoryForm((isVisible) => !isVisible);
-                                        setCategoryMessage(null);
-                                    }}
-                                >
-                                    {showCategoryForm ? 'Close Category Form' : '+ Add Category'}
-                                </button>
+                                <div className="category-form" style={{maxWidth: 'none', margin: '0 0 1.5rem', padding: 0, overflow: 'hidden'}}>
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        gap: '1rem',
+                                        flexWrap: 'wrap',
+                                        padding: '0.8rem 1rem',
+                                        background: '#f8fafc',
+                                        borderBottom: '1px solid #e2e8f0'
+                                    }}>
+                                        <div role="tablist" aria-label="Catalog views" style={{display: 'flex', gap: '0.25rem'}}>
+                                            <button
+                                                type="button"
+                                                role="tab"
+                                                aria-selected={adminCatalogView === 'list'}
+                                                onClick={closeCatalogDetail}
+                                                style={{
+                                                    border: 'none',
+                                                    borderBottom: adminCatalogView === 'list' ? '2px solid #a855f7' : '2px solid transparent',
+                                                    padding: '0.65rem 1rem',
+                                                    background: 'transparent',
+                                                    color: adminCatalogView === 'list' ? '#9333ea' : '#64748b',
+                                                    fontWeight: 600,
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                List View
+                                            </button>
+                                            <button
+                                                type="button"
+                                                role="tab"
+                                                aria-selected={adminCatalogView === 'detail'}
+                                                onClick={() => adminCatalogView === 'detail' && setAdminCatalogView('detail')}
+                                                disabled={adminCatalogView !== 'detail'}
+                                                style={{
+                                                    border: 'none',
+                                                    borderBottom: adminCatalogView === 'detail' ? '2px solid #a855f7' : '2px solid transparent',
+                                                    padding: '0.65rem 1rem',
+                                                    background: 'transparent',
+                                                    color: adminCatalogView === 'detail' ? '#9333ea' : '#94a3b8',
+                                                    fontWeight: 600,
+                                                    cursor: adminCatalogView === 'detail' ? 'pointer' : 'default'
+                                                }}
+                                            >
+                                                Detail View
+                                            </button>
+                                        </div>
+                                        {adminCatalogView === 'list' ? (
+                                            <div style={{display: 'flex', gap: '0.5rem', flexWrap: 'wrap'}}>
+                                                <button
+                                                    type="button"
+                                                    className="enquire-btn"
+                                                    disabled={spreadsheetSubmitting}
+                                                    onClick={() => downloadSpreadsheet('template', 'product-import-template.xlsx')}
+                                                >
+                                                    Download Excel Template
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="enquire-btn"
+                                                    disabled={spreadsheetSubmitting}
+                                                    onClick={() => downloadSpreadsheet('export', 'products-export.xlsx')}
+                                                >
+                                                    Export Products
+                                                </button>
+                                                <button type="button" className="enquire-btn" onClick={openNewCategoryForm}>
+                                                    + Add Category
+                                                </button>
+                                                <button type="button" className="enquire-btn" onClick={() => openProductForm(null)}>
+                                                    + Add Product
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <button type="button" className="enquire-btn" style={{background: '#64748b'}} onClick={closeCatalogDetail}>
+                                                Back to List
+                                            </button>
+                                        )}
+                                    </div>
+                                    {adminCatalogView === 'list' && (
+                                        <form onSubmit={importSpreadsheet} style={{display: 'flex', alignItems: 'end', gap: '0.75rem', flexWrap: 'wrap', padding: '0.75rem 1rem'}}>
+                                            <label style={{margin: 0}}>
+                                                Import Excel (.xlsx)
+                                                <input
+                                                    type="file"
+                                                    accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                                    disabled={spreadsheetSubmitting}
+                                                    onChange={(event) => {
+                                                        setSpreadsheetFile(event.target.files?.[0] || null);
+                                                        event.target.value = '';
+                                                    }}
+                                                />
+                                            </label>
+                                            <button type="submit" className="enquire-btn" disabled={spreadsheetSubmitting || !spreadsheetFile}>
+                                                {spreadsheetSubmitting ? 'Processing...' : 'Import Products'}
+                                            </button>
+                                        </form>
+                                    )}
+                                    {spreadsheetMessage && (
+                                        <p className={`category-form-message ${spreadsheetMessage.type}`} role="status" style={{margin: '0 1rem 0.75rem'}}>
+                                            {spreadsheetMessage.text}
+                                        </p>
+                                    )}
+                                    {adminCatalogView === 'list' && categoryMessage && (
+                                        <p className={`category-form-message ${categoryMessage.type}`} role="status" style={{margin: '0 1rem 0.75rem'}}>
+                                            {categoryMessage.text}
+                                        </p>
+                                    )}
+                                    {adminCatalogView === 'list' && addProductMessage && (
+                                        <p className={`category-form-message ${addProductMessage.type}`} role="status" style={{margin: '0 1rem 0.75rem'}}>
+                                            {addProductMessage.text}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
 
-                                {showCategoryForm && (
-                                    <form onSubmit={addCategory} style={{marginTop: '1rem'}}>
+                            {isAdmin && adminCatalogView === 'detail' && showCategoryForm && (
+                                <div className="category-form" style={{margin: '1rem 0'}}>
+                                    <h3 style={{marginTop: 0}}>Add Product Category</h3>
+                                    <form onSubmit={addCategory}>
                                         <div className="category-form-fields">
                                             <label>
                                                 Category name
@@ -2392,13 +3032,13 @@
                                                     value={categoryName}
                                                     onChange={(event) => setCategoryName(event.target.value)}
                                                     placeholder="e.g. Networking"
+                                                    maxLength={150}
                                                     required
                                                 />
                                             </label>
                                             <label>
                                                 Description (optional)
-                                                <input
-                                                    type="text"
+                                                <textarea
                                                     value={categoryDescription}
                                                     onChange={(event) => setCategoryDescription(event.target.value)}
                                                     placeholder="Add a short description"
@@ -2407,6 +3047,9 @@
                                             <button type="submit" className="enquire-btn" disabled={categorySubmitting}>
                                                 {categorySubmitting ? 'Adding...' : 'Save Category'}
                                             </button>
+                                            <button type="button" className="enquire-btn" style={{background: '#64748b'}} onClick={closeCatalogDetail}>
+                                                Cancel
+                                            </button>
                                         </div>
                                         {categoryMessage && (
                                             <p className={`category-form-message ${categoryMessage.type}`} role="status">
@@ -2414,12 +3057,12 @@
                                             </p>
                                         )}
                                     </form>
-                                )}
-                            </div>
+                                </div>
                             )}
 
-                            {isAdmin && showProductForm && (
+                            {isAdmin && adminCatalogView === 'detail' && showProductForm && (
                                 <div className="category-form" style={{marginBottom: '1.5rem'}}>
+                                    <h3 style={{marginTop: 0}}>{editingProductId ? 'Edit Product' : 'Add Product'}</h3>
                                     <form onSubmit={addProduct}>
                                         <div className="category-form-fields">
                                             <label>
@@ -2450,24 +3093,33 @@
                                                 />
                                             </label>
                                             <label>
-                                                Description (optional)
+                                                Product code (auto-generated if left blank)
                                                 <input
                                                     type="text"
+                                                    value={newProductCode}
+                                                    onChange={(event) => setNewProductCode(event.target.value)}
+                                                    placeholder="e.g. SKU-001"
+                                                />
+                                            </label>
+                                            <label>
+                                                Description (optional)
+                                                <textarea
                                                     value={newProductDescription}
                                                     onChange={(event) => setNewProductDescription(event.target.value)}
                                                     placeholder="Add a short description"
+                                                    maxLength={1000}
                                                 />
                                             </label>
                                             <button type="submit" className="enquire-btn" disabled={productSubmitting}>
-                                                {productSubmitting ? 'Adding...' : 'Save Product'}
+                                                {productSubmitting ? 'Saving...' : (editingProductId ? 'Update Product' : 'Save Product')}
                                             </button>
                                             <button
                                                 type="button"
                                                 className="enquire-btn"
                                                 style={{background: '#64748b'}}
-                                                onClick={() => setShowProductForm(false)}
+                                                onClick={closeCatalogDetail}
                                             >
-                                                Close
+                                                Cancel
                                             </button>
                                         </div>
                                         {addProductMessage && (
@@ -2476,9 +3128,64 @@
                                             </p>
                                         )}
                                     </form>
+                                    <div style={{marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #e2e8f0'}}>
+                                        <h4 style={{margin: '0 0 0.75rem'}}>Product Images</h4>
+                                        {editingProductId ? (
+                                            <>
+                                                <label style={{display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: '#374151', fontWeight: 600, cursor: 'pointer'}}>
+                                                    {uploadingImagesForId === editingProductId ? 'Uploading images...' : 'Add image(s)'}
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        multiple
+                                                        disabled={uploadingImagesForId === editingProductId}
+                                                        onChange={(event) => {
+                                                            uploadProductImages(editingProductId, event.target.files);
+                                                            event.target.value = '';
+                                                        }}
+                                                        style={{maxWidth: '250px'}}
+                                                    />
+                                                </label>
+                                                {editingProductImages.length > 0 ? (
+                                                    <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '0.75rem'}}>
+                                                        {editingProductImages.map((image) => {
+                                                            const imageId = image.productImageId || image.id;
+                                                            const imageUrl = image.imageUrl || image.url;
+                                                            const displayImageUrl = imageUrl?.startsWith('http') ? imageUrl : `${API_ROOT}${imageUrl}`;
+                                                            return (
+                                                                <div key={imageId} style={{position: 'relative', border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden'}}>
+                                                                    <img src={displayImageUrl} alt={newProductName || 'Product'} style={{display: 'block', width: '100%', height: '120px', objectFit: 'cover'}} />
+                                                                    <button
+                                                                        type="button"
+                                                                        className="enquire-btn"
+                                                                        style={{width: '100%', padding: '0.45rem', borderRadius: 0, background: '#dc2626'}}
+                                                                        disabled={deletingImageId === imageId}
+                                                                        onClick={() => deleteProductImage(editingProductId, imageId)}
+                                                                    >
+                                                                        {deletingImageId === imageId ? 'Deleting...' : 'Delete image'}
+                                                                    </button>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                ) : (
+                                                    <p style={{color: '#64748b'}}>No images have been added to this product yet.</p>
+                                                )}
+                                                {productMessage && (
+                                                    <p className={`category-form-message ${productMessage.type}`} role="status">
+                                                        {productMessage.text}
+                                                    </p>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <p style={{color: '#64748b'}}>Save the product first, then edit it to add or remove images.</p>
+                                        )}
+                                    </div>
                                 </div>
                             )}
 
+                            {(!isAdmin || adminCatalogView === 'list') && (
+                            <>
                             <div style={{textAlign: 'center', marginBottom: '2rem'}}>
                                 <button
                                     onClick={() => setActiveTab('all')}
@@ -2511,8 +3218,8 @@
                                                     border: 'none',
                                                     borderRadius: '5px',
                                                     cursor: 'pointer',
-                                                     background: activeTab === categoryId ? 'var(--brand-blue)' : '#ddd',
-                                                    color: activeTab === categoryId ? 'var(--text)' : '#333',
+                                                     background: isCategoryActive(categoryValue) ? 'var(--brand-blue)' : '#ddd',
+                                                    color: isCategoryActive(categoryValue) ? 'var(--text)' : '#333',
                                                     fontWeight: 600
                                                 }}
                                             >
@@ -2551,16 +3258,15 @@
                                             {isAdmin && (
                                             <button
                                                 type="button"
-                                                title={`Add product to ${categoryValue}`}
+                                                title={`Rename ${categoryValue}`}
                                                 onClick={(event) => {
                                                     event.stopPropagation();
-                                                    openProductForm(categoryId);
+                                                    openCategoryEditor(category);
                                                 }}
                                                 style={{
                                                     position: 'absolute',
                                                     bottom: '-10px',
-                                                    left: '50%',
-                                                    transform: 'translateX(-50%)',
+                                                    right: '0',
                                                     width: '20px',
                                                     height: '20px',
                                                     lineHeight: '18px',
@@ -2568,13 +3274,14 @@
                                                     border: 'none',
                                                     borderRadius: '50%',
                                                     cursor: 'pointer',
-                                                    background: '#16a34a',
+                                                    background: '#2563eb',
                                                     color: 'white',
-                                                    fontSize: '0.8rem',
-                                                    fontWeight: 700
+                                                    fontSize: '0.7rem',
+                                                    fontWeight: 700,
+                                                    zIndex: 1
                                                 }}
                                             >
-                                                +
+                                                ✎
                                             </button>
                                             )}
                                         </span>
@@ -2582,7 +3289,53 @@
                                 })}
                                 {categoriesError && <span style={{display: 'block', width: '100%', color: '#dc2626', marginTop: '0.75rem'}}>Could not load categories: {categoriesError}</span>}
                             </div>
+                            </>
+                            )}
 
+                            {isAdmin && adminCatalogView === 'detail' && editingCategoryId !== null && (
+                                <div className="category-form" style={{marginBottom: '1.5rem'}}>
+                                    <h3 style={{marginTop: 0}}>Edit Product Category</h3>
+                                    <form onSubmit={updateCategory}>
+                                        <div className="category-form-fields">
+                                            <label>
+                                                Category name
+                                                <input
+                                                    type="text"
+                                                    value={editingCategoryName}
+                                                    onChange={(event) => setEditingCategoryName(event.target.value)}
+                                                    maxLength={150}
+                                                    required
+                                                />
+                                            </label>
+                                            <label>
+                                                Description
+                                                <textarea
+                                                    value={editingCategoryDescription}
+                                                    onChange={(event) => setEditingCategoryDescription(event.target.value)}
+                                                />
+                                            </label>
+                                            <button type="submit" className="enquire-btn" disabled={categorySubmitting}>
+                                                {categorySubmitting ? 'Saving...' : 'Update Category'}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="enquire-btn"
+                                                style={{background: '#64748b'}}
+                                                onClick={closeCatalogDetail}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                        {categoryMessage && (
+                                            <p className={`category-form-message ${categoryMessage.type}`} role="status">
+                                                {categoryMessage.text}
+                                            </p>
+                                        )}
+                                    </form>
+                                </div>
+                            )}
+
+                            {(!isAdmin || adminCatalogView === 'list') && (
                             <div className="product-grid">
                                 {loading && (
                                     <p style={{gridColumn: '1/-1', textAlign: 'center', color: '#6b7280', padding: '3rem'}}>Loading products...</p>
@@ -2615,6 +3368,32 @@
 
                                     return (
                                         <div key={productId} className="product-card" style={{ position: 'relative' }}>
+                                            {isAdmin && (
+                                            <button
+                                                type="button"
+                                                title={`Edit ${productName}`}
+                                                onClick={() => openProductForm(product.catId, product)}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '8px',
+                                                    right: '42px',
+                                                    width: '26px',
+                                                    height: '26px',
+                                                    lineHeight: '24px',
+                                                    padding: 0,
+                                                    border: 'none',
+                                                    borderRadius: '50%',
+                                                    cursor: 'pointer',
+                                                    background: '#2563eb',
+                                                    color: 'white',
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: 700,
+                                                    zIndex: 2
+                                                }}
+                                            >
+                                                ✎
+                                            </button>
+                                            )}
                                             {isAdmin && (
                                             <button
                                                 type="button"
@@ -2709,33 +3488,6 @@
                                                             </span>
                                                         </>
                                                     )}
-                                                    {isAdmin && (
-                                                    <button
-                                                        type="button"
-                                                        title="Delete this image"
-                                                        disabled={deletingImageId === currentImageId}
-                                                        onClick={() => deleteProductImage(productId, currentImageId)}
-                                                        style={{
-                                                            position: 'absolute',
-                                                            top: '6px',
-                                                            left: '6px',
-                                                            width: '22px',
-                                                            height: '22px',
-                                                            lineHeight: '20px',
-                                                            borderRadius: '50%',
-                                                            border: 'none',
-                                                            cursor: deletingImageId === currentImageId ? 'not-allowed' : 'pointer',
-                                                            background: '#dc2626',
-                                                            color: 'white',
-                                                            fontSize: '0.75rem',
-                                                            fontWeight: 700,
-                                                            padding: 0,
-                                                            opacity: deletingImageId === currentImageId ? 0.6 : 1
-                                                        }}
-                                                    >
-                                                        {deletingImageId === currentImageId ? '…' : '🗑'}
-                                                    </button>
-                                                    )}
                                                 </div>
                                             ) : (
                                                  <div style={{background: 'var(--brand-blue)', color: 'var(--text)', fontSize: '3rem', padding: '2rem', textAlign: 'center'}}>
@@ -2744,26 +3496,11 @@
                                             )}
                                             <div className="product-body">
                                                 <h3>{productName}</h3>
+                                                {product.productCode && <p style={{fontSize: '0.8rem', color: '#64748b', fontWeight: 600}}>Product Code: {product.productCode}</p>}
                                                 {productDescription && <p>{productDescription}</p>}
-                                                {isAdmin && (
-                                                <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.5rem', cursor: 'pointer' }}>
-                                                    {uploadingImagesForId === productId ? 'Uploading...' : '📤 Upload image(s)'}
-                                                    <input
-                                                        type="file"
-                                                        accept="image/*"
-                                                        multiple
-                                                        disabled={uploadingImagesForId === productId}
-                                                        onChange={(event) => {
-                                                            uploadProductImages(productId, event.target.files);
-                                                            event.target.value = '';
-                                                        }}
-                                                        style={{ display: 'none' }}
-                                                    />
-                                                </label>
-                                                )}
                                                 <button
                                                     className="enquire-btn"
-                                                    onClick={() => sendWhatsAppMessage(productName)}
+                                                    onClick={() => sendProductEnquiry(productName)}
                                                 >
                                                     Enquire Now
                                                 </button>
@@ -2772,6 +3509,7 @@
                                     );
                                 })}
                             </div>
+                            )}
                         </div>
                     </section>
 
@@ -3015,27 +3753,51 @@
 
                                 {showContactForm && (
                                     <form onSubmit={updateContact} style={{marginTop: '1rem'}}>
-                                        <div className="category-form-fields">
-                                            <label>
-                                                Phone
-                                                <input type="text" value={contactPhone} onChange={(event) => setContactPhone(event.target.value)} placeholder="+254207903190" />
-                                            </label>
-                                            <label>
-                                                WhatsApp number
-                                                <input type="text" value={contactWhatsApp} onChange={(event) => setContactWhatsApp(event.target.value)} placeholder="+254735610610" />
-                                            </label>
-                                            <label>
-                                                Email
-                                                <input type="email" value={contactEmail} onChange={(event) => setContactEmail(event.target.value)} placeholder="info@onesourcesolutionske.com" />
-                                            </label>
-                                            <label>
-                                                Location
-                                                <input type="text" value={contactLocation} onChange={(event) => setContactLocation(event.target.value)} placeholder="Office address" />
-                                            </label>
-                                            <label>
-                                                Website
-                                                <input type="text" value={contactWebsite} onChange={(event) => setContactWebsite(event.target.value)} placeholder="https://www.onesourcesolutionske.com" />
-                                            </label>
+                                        <div style={{display: 'grid', gap: '0.75rem'}}>
+                                            {contactDetails.map((detail, index) => (
+                                                <div key={detail.clientKey || detail.contactDetailId || index} style={{display: 'grid', gridTemplateColumns: 'auto repeat(auto-fit, minmax(130px, 1fr)) auto', alignItems: 'end', gap: '0.75rem'}}>
+                                                    {['phone', 'whatsapp', 'email'].includes(detail.type) ? (
+                                                        <label style={{display: 'flex', alignItems: 'center', gap: '0.35rem', paddingBottom: '0.7rem'}}>
+                                                            <input
+                                                                type="radio"
+                                                                name="enquiryContact"
+                                                                checked={!!detail.isEnquiry}
+                                                                onChange={() => setContactDetails(details => details.map((item, itemIndex) => ({ ...item, isEnquiry: itemIndex === index })))}
+                                                            />
+                                                            Enquiry
+                                                        </label>
+                                                    ) : <span />}
+                                                    <label>
+                                                        Label
+                                                        <input type="text" value={detail.label} maxLength="100" onChange={(event) => updateContactDetail(index, 'label', event.target.value)} required placeholder="Facebook" />
+                                                    </label>
+                                                    <label>
+                                                        Type
+                                                        <select value={detail.type} onChange={(event) => updateContactDetail(index, 'type', event.target.value)}>
+                                                            <option value="phone">Phone</option>
+                                                            <option value="whatsapp">WhatsApp</option>
+                                                            <option value="email">Email</option>
+                                                            <option value="address">Address</option>
+                                                            <option value="website">Website</option>
+                                                            <option value="link">Social / other link</option>
+                                                            <option value="text">Text</option>
+                                                        </select>
+                                                    </label>
+                                                    <label>
+                                                        Value
+                                                        <input type="text" value={detail.value} maxLength="500" onChange={(event) => updateContactDetail(index, 'value', event.target.value)} required placeholder={detail.type === 'link' ? 'https://facebook.com/your-page' : 'Contact detail'} />
+                                                    </label>
+                                                    <button type="button" className="enquire-btn" style={{background: '#dc2626', padding: '0.7rem 1rem'}} onClick={() => removeContactDetail(index)}>
+                                                        Remove
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            {!contactDetails.some(detail => detail.isEnquiry) && (contact?.enquiryWhatsAppNumber || contact?.whatsApp) && (
+                                                <p role="status">No enquiry contact is selected. Product enquiries will continue to use the saved WhatsApp number {contact.enquiryWhatsAppNumber || contact.whatsApp}.</p>
+                                            )}
+                                            <button type="button" className="enquire-btn" style={{justifySelf: 'start'}} onClick={addContactDetail}>
+                                                Add Contact Detail
+                                            </button>
                                             <button type="submit" className="enquire-btn" disabled={contactSubmitting}>
                                                 {contactSubmitting ? 'Saving...' : 'Save Contact Details'}
                                             </button>
@@ -3055,35 +3817,19 @@
                                 <p>Loading contact details...</p>
                             ) : (
                             <div className="contact-info">
-                                <a href={`mailto:${contact?.email || 'info@onesourcesolutionske.com'}`} className="contact-card">
-                                    <strong>📧 Email</strong>
-                                    <span>{contact?.email || 'info@onesourcesolutionske.com'}</span>
-                                </a>
+                                {contactDetails.map((detail, index) => {
+                                    const href = getContactDetailHref(detail);
+                                    const cardContent = (
+                                        <>
+                                            <strong>{getContactDetailIcon(detail.type)} {detail.label}</strong>
+                                            <span>{detail.value}</span>
+                                        </>
+                                    );
 
-                                <a href={`https://wa.me/${(contact?.whatsApp || '+254735610610').replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" className="contact-card">
-                                    <strong>📱 WhatsApp</strong>
-                                    <span>{contact?.whatsApp || '+254 735 610610'}</span>
-                                </a>
-
-                                <a href={`tel:${contact?.phone || '+254207903190'}`} className="contact-card">
-                                    <strong>☎️ Phone</strong>
-                                    <span>{contact?.phone || '020 7903190'}</span>
-                                </a>
-
-                                <a href={`https://maps.google.com/?q=${encodeURIComponent(contact?.location || 'Nairobi, Kenya')}`} target="_blank" rel="noreferrer" className="contact-card">
-                                    <strong>📍 Location</strong>
-                                    <span>{contact?.location || 'Nairobi, Kenya'}</span>
-                                </a>
-
-                                <div className="contact-card">
-                                    <strong>📮 Postal Address</strong>
-                                    <span>P.O. Box 221 – 00623, Nairobi, Kenya</span>
-                                </div>
-
-                                <a href={contact?.website || 'https://www.onesourcesolutionske.com'} target="_blank" rel="noreferrer" className="contact-card">
-                                    <strong>🌐 Website</strong>
-                                    <span>{contact?.website || 'www.onesourcesolutionske.com'}</span>
-                                </a>
+                                    return href
+                                        ? <a key={detail.contactDetailId || detail.clientKey || index} href={href} target={['address', 'website', 'link'].includes(detail.type) ? '_blank' : undefined} rel={['address', 'website', 'link'].includes(detail.type) ? 'noreferrer' : undefined} className="contact-card">{cardContent}</a>
+                                        : <div key={detail.contactDetailId || detail.clientKey || index} className="contact-card">{cardContent}</div>;
+                                })}
                             </div>
                             )}
                         </div>
@@ -3092,9 +3838,11 @@
                     <footer>
                         <p>&copy; 2025 OneSource Solutions Limited. All rights reserved.</p>
                         <p style={{marginTop: '1rem', fontSize: '0.9rem'}}>
-                            <a href={`mailto:${contact?.email || 'info@onesourcesolutionske.com'}`}>Contact</a>
-                            <a href={`https://wa.me/${(contact?.whatsApp || '+254735610610').replace(/[^0-9]/g, '')}`}>WhatsApp</a>
-                            <a href={`tel:${contact?.phone || '+254207903190'}`}>Phone</a>
+                            {contactDetails.filter(detail => getContactDetailHref(detail)).map((detail, index) => (
+                                <a key={detail.contactDetailId || detail.clientKey || index} href={getContactDetailHref(detail)} target={['address', 'website', 'link'].includes(detail.type) ? '_blank' : undefined} rel={['address', 'website', 'link'].includes(detail.type) ? 'noreferrer' : undefined}>
+                                    {detail.label}
+                                </a>
+                            ))}
                         </p>
                         <p style={{marginTop: '1rem', fontSize: '0.8rem', opacity: 0.7}}>
                             ICT Solutions for Business Growth • KRA Licensed • 24/7 Support

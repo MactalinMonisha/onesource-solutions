@@ -26,6 +26,11 @@ namespace OneSource.Api.Models
         [MaxLength(255)]
         public string? Website { get; set; }
 
+        [MaxLength(20)]
+        public string? EnquiryWhatsAppNumber { get; set; }
+
+        public ICollection<ContactDetail> Details { get; set; } = new List<ContactDetail>();
+
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
     }

@@ -6,7 +6,9 @@ public record ContactDto(
     string? WhatsApp,
     string? Email,
     string? Location,
-    string? Website
+    string? Website,
+    string? EnquiryWhatsAppNumber,
+    IReadOnlyList<ContactDetailDto> Details
 );
 
 public record UpdateContactDto(
@@ -14,5 +16,22 @@ public record UpdateContactDto(
     string? WhatsApp,
     string? Email,
     string? Location,
-    string? Website
+    string? Website,
+    IReadOnlyList<UpdateContactDetailDto>? Details = null
+);
+
+public record ContactDetailDto(
+    int ContactDetailId,
+    string Label,
+    string Value,
+    string Type,
+    int SortOrder,
+    bool IsEnquiry
+);
+
+public record UpdateContactDetailDto(
+    string Label,
+    string Value,
+    string Type,
+    bool IsEnquiry = false
 );

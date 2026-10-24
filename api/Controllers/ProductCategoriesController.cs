@@ -48,6 +48,26 @@ public class ProductCategoriesController(AppDbContext db) : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = category.CateId }, result);
     }
 
+    [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<ProductCategoryDto>> Update(int id, UpdateProductCategoryDto dto)
+    {
+        var category = await db.ProductCategories.FindAsync(id);
+        if (category is null || !category.IsActive) return NotFound();
+
+        var name = dto.CatName.Trim();
+        if (string.IsNullOrWhiteSpace(name) || name.Length > 150)
+            return BadRequest("Category name is required and must be 150 characters or fewer.");
+        if (await db.ProductCategories.AnyAsync(c => c.CateId != id && c.CatName.ToLower() == name.ToLower()))
+            return Conflict($"A category named '{name}' already exists.");
+
+        category.CatName = name;
+        category.Description = dto.Description?.Trim();
+        await db.SaveChangesAsync();
+
+        return Ok(new ProductCategoryDto(category.CateId, category.CatName, category.Description, category.IsActive));
+    }
+
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)

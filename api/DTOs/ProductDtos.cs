@@ -4,6 +4,7 @@ public record ProductDto(
     int ProductId,
     string ProductName,
     string? ProductDescription,
+    string? ProductCode,
     int CatId,
     string? CategoryName,
     bool IsActive
@@ -19,6 +20,7 @@ public record ProductWithImagesDto(
     int ProductId,
     string ProductName,
     string? ProductDescription,
+    string? ProductCode,
     int CatId,
     string? CategoryName,
     bool IsActive,
@@ -28,14 +30,16 @@ public record ProductWithImagesDto(
 public record CreateProductDto(
     string ProductName,
     string? ProductDescription,
-    int CatId
+    int CatId,
+    string? ProductCode = null
 );
 
 public record CreateProductWithImagesDto(
     string ProductName,
     string? ProductDescription,
     int CatId,
-    List<string> ImageUrls
+    List<string> ImageUrls,
+    string? ProductCode = null
 );
 
 public record UploadProductImagesDto(
@@ -46,5 +50,8 @@ public record UpdateProductDto(
     string ProductName,
     string? ProductDescription,
     int CatId,
-    bool IsActive
+    bool IsActive,
+    string? ProductCode = null
 );
+
+public record ProductImportResultDto(int Created, int Updated, int CategoriesCreated);

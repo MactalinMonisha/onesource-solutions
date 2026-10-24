@@ -28,9 +28,19 @@ Full-stack sales/catalog site for OneSource Solutions Limited (ICT company - TIM
 ### Key endpoints
 
 - `GET /api/ProductCategories` — list categories
+- `PUT /api/ProductCategories/{id}` — Admin-only category rename/description update
 - `GET /api/Products/by-category/{id}` — list products (id = 0 for all)
+- `PUT /api/Products/{id}` — Admin-only product name, description, category, and code update
+- `GET /api/Products/template` — Admin-only Excel import template (`.xlsx`)
+- `POST /api/Products/import` — Admin-only Excel import; creates missing categories and upserts products by product code
+- `GET /api/Products/export` — Admin-only Excel export of active products and categories
+- `GET /api/Contact` — read the public contact details
+- `PUT /api/Contact` — Admin-only replacement of the contact detail list (`details` entries have `label`, `value`, `type`, and optional `isEnquiry`; enquiry targets can be phone, WhatsApp, or email; a removed WhatsApp number is retained as the enquiry fallback)
+- `GET /api/Carousel` — read the carousel slides
+- `PUT /api/Carousel` — Admin-only replacement of carousel slides (image URL, alt text, label, description, and title)
+- `POST /api/Carousel/upload-image` — Admin-only upload of a local JPEG, PNG, WebP, or GIF carousel image (up to 10 MB); returns an image URL for the carousel slide
 - `POST /api/Auth/login` — returns a JWT for `admin` role
-- Admin-only (require `Authorization: Bearer <token>`): create/delete categories, create/update/delete products, upload/delete product images
+- Admin-only (require `Authorization: Bearer <token>`): create/update/delete categories, create/update/delete products, upload/delete product images, and import/export product spreadsheets. New products and imported rows without a code receive the next numeric product code (`001`, `002`, ...); product codes already assigned during backfill are preserved. Spreadsheet columns are `Product Cate(*)`, `Product Cate Desc`, `Product Code`, `Product(*)`, and `Product Desc`; supplied product codes match case-insensitively.
 
 ## Frontend setup (`web/`)
 

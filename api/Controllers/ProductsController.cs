@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using OneSource.Api.Data;
 using OneSource.Api.DTOs;
 using OneSource.Api.Models;
+using OneSource.Api.Services;
 
 namespace OneSource.Api.Controllers;
 
@@ -23,7 +24,7 @@ public class ProductsController(AppDbContext db, IWebHostEnvironment env) : Cont
             .Include(p => p.Category)
             .OrderBy(p => p.CatId)
             .ThenBy(p => p.ProductId)
-            .Select(p => new ProductDto(p.ProductId, p.ProductName, p.ProductDescription, p.CatId, p.Category!.CatName, p.IsActive))
+            .Select(p => new ProductDto(p.ProductId, p.ProductName, p.ProductDescription, p.ProductCode, p.CatId, p.Category!.CatName, p.IsActive))
             .ToListAsync();
 
         return Ok(products);
@@ -34,7 +35,7 @@ public class ProductsController(AppDbContext db, IWebHostEnvironment env) : Cont
     {
         var product = await db.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.ProductId == id);
         if (product is null || !product.IsActive) return NotFound();
-        return Ok(new ProductDto(product.ProductId, product.ProductName, product.ProductDescription, product.CatId, product.Category?.CatName, product.IsActive));
+        return Ok(new ProductDto(product.ProductId, product.ProductName, product.ProductDescription, product.ProductCode, product.CatId, product.Category?.CatName, product.IsActive));
     }
 
     [HttpGet("by-category/{categoryId:int}")]
@@ -59,6 +60,7 @@ public class ProductsController(AppDbContext db, IWebHostEnvironment env) : Cont
                 p.ProductId,
                 p.ProductName,
                 p.ProductDescription,
+                p.ProductCode,
                 p.CatId,
                 p.Category!.CatName,
                 p.IsActive,
@@ -74,15 +76,28 @@ public class ProductsController(AppDbContext db, IWebHostEnvironment env) : Cont
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ProductDto>> Create(CreateProductDto dto)
     {
+        var validationError = await ValidateProductInput(dto.ProductName, dto.ProductDescription, dto.ProductCode, dto.CatId);
+        if (validationError is not null) return BadRequest(validationError);
+
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        await ProductCodeGenerator.AcquireLockAsync(db);
+        var code = string.IsNullOrWhiteSpace(dto.ProductCode)
+            ? await ProductCodeGenerator.GenerateNextAsync(db)
+            : dto.ProductCode.Trim();
+        if (await db.Products.AnyAsync(p => p.ProductCode != null && p.ProductCode.ToLower() == code.ToLower()))
+            return Conflict($"Product code '{code}' is already in use.");
+
         var product = new Product
         {
-            ProductName = dto.ProductName,
-            ProductDescription = dto.ProductDescription,
-            CatId = dto.CatId
+            ProductName = dto.ProductName.Trim(),
+            ProductDescription = dto.ProductDescription?.Trim(),
+            CatId = dto.CatId,
+            ProductCode = code
         };
         db.Products.Add(product);
         await db.SaveChangesAsync();
-        var result = new ProductDto(product.ProductId, product.ProductName, product.ProductDescription, product.CatId, null, product.IsActive);
+        await transaction.CommitAsync();
+        var result = new ProductDto(product.ProductId, product.ProductName, product.ProductDescription, product.ProductCode, product.CatId, null, product.IsActive);
         return CreatedAtAction(nameof(GetById), new { id = product.ProductId }, result);
     }
 
@@ -90,14 +105,23 @@ public class ProductsController(AppDbContext db, IWebHostEnvironment env) : Cont
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ProductWithImagesDto>> CreateWithImages(CreateProductWithImagesDto dto)
     {
-        var categoryExists = await db.ProductCategories.AnyAsync(c => c.CateId == dto.CatId);
-        if (!categoryExists) return NotFound($"Product category {dto.CatId} was not found.");
+        var validationError = await ValidateProductInput(dto.ProductName, dto.ProductDescription, dto.ProductCode, dto.CatId);
+        if (validationError is not null) return BadRequest(validationError);
+
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        await ProductCodeGenerator.AcquireLockAsync(db);
+        var code = string.IsNullOrWhiteSpace(dto.ProductCode)
+            ? await ProductCodeGenerator.GenerateNextAsync(db)
+            : dto.ProductCode.Trim();
+        if (await db.Products.AnyAsync(p => p.ProductCode != null && p.ProductCode.ToLower() == code.ToLower()))
+            return Conflict($"Product code '{code}' is already in use.");
 
         var product = new Product
         {
-            ProductName = dto.ProductName,
-            ProductDescription = dto.ProductDescription,
+            ProductName = dto.ProductName.Trim(),
+            ProductDescription = dto.ProductDescription?.Trim(),
             CatId = dto.CatId,
+            ProductCode = code,
             ProductImages = dto.ImageUrls
                 .Select(url => new ProductImage { ImageUrl = url })
                 .ToList()
@@ -105,11 +129,13 @@ public class ProductsController(AppDbContext db, IWebHostEnvironment env) : Cont
 
         db.Products.Add(product);
         await db.SaveChangesAsync();
+        await transaction.CommitAsync();
 
         var result = new ProductWithImagesDto(
             product.ProductId,
             product.ProductName,
             product.ProductDescription,
+            product.ProductCode,
             product.CatId,
             null,
             product.IsActive,
@@ -142,6 +168,7 @@ public class ProductsController(AppDbContext db, IWebHostEnvironment env) : Cont
             product.ProductId,
             product.ProductName,
             product.ProductDescription,
+            product.ProductCode,
             product.CatId,
             product.Category?.CatName,
             product.IsActive,
@@ -206,6 +233,7 @@ public class ProductsController(AppDbContext db, IWebHostEnvironment env) : Cont
             product.ProductId,
             product.ProductName,
             product.ProductDescription,
+            product.ProductCode,
             product.CatId,
             product.Category?.CatName,
             product.IsActive,
@@ -244,13 +272,41 @@ public class ProductsController(AppDbContext db, IWebHostEnvironment env) : Cont
         var product = await db.Products.FindAsync(id);
         if (product is null) return NotFound();
 
-        product.ProductName = dto.ProductName;
-        product.ProductDescription = dto.ProductDescription;
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        await ProductCodeGenerator.AcquireLockAsync(db);
+        var code = string.IsNullOrWhiteSpace(dto.ProductCode) ? null : dto.ProductCode.Trim();
+        if (code is not null && await db.Products.AnyAsync(p => p.ProductId != id && p.ProductCode != null && p.ProductCode.ToLower() == code.ToLower()))
+            return Conflict($"Product code '{code}' is already in use.");
+        if (code?.Length > 100) return BadRequest("Product code must be 100 characters or fewer.");
+        if (string.IsNullOrWhiteSpace(dto.ProductName) || dto.ProductName.Trim().Length > 200)
+            return BadRequest("Product name is required and must be 200 characters or fewer.");
+        if (dto.ProductDescription?.Length > 1000)
+            return BadRequest("Product description must be 1000 characters or fewer.");
+        if (!await db.ProductCategories.AnyAsync(c => c.CateId == dto.CatId && c.IsActive))
+            return BadRequest("The selected product category is unavailable.");
+
+        product.ProductName = dto.ProductName.Trim();
+        product.ProductDescription = dto.ProductDescription?.Trim();
         product.CatId = dto.CatId;
+        product.ProductCode = code;
         product.IsActive = dto.IsActive;
 
         await db.SaveChangesAsync();
+        await transaction.CommitAsync();
         return NoContent();
+    }
+
+    private async Task<string?> ValidateProductInput(string productName, string? description, string? productCode, int categoryId)
+    {
+        if (string.IsNullOrWhiteSpace(productName) || productName.Trim().Length > 200)
+            return "Product name is required and must be 200 characters or fewer.";
+        if (description?.Length > 1000)
+            return "Product description must be 1000 characters or fewer.";
+        if (productCode?.Trim().Length > 100)
+            return "Product code must be 100 characters or fewer.";
+        if (!await db.ProductCategories.AnyAsync(category => category.CateId == categoryId && category.IsActive))
+            return "The selected product category is unavailable.";
+        return null;
     }
 
     [HttpDelete("{id:int}")]

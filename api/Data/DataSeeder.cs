@@ -13,6 +13,7 @@ public static class DataSeeder
         await SeedContactAsync(db);
         await SeedAboutContentAsync(db);
         await SeedHomeContentAsync(db);
+        await SeedCarouselSlidesAsync(db);
         await SeedTrustedCompaniesAsync(db);
         await SeedOffersAsync(db);
 
@@ -59,6 +60,42 @@ public static class DataSeeder
         };
 
         await db.Products.AddRangeAsync(products);
+        await db.SaveChangesAsync();
+    }
+
+    private static async Task SeedCarouselSlidesAsync(AppDbContext db)
+    {
+        if (await db.CarouselSlides.AnyAsync()) return;
+
+        db.CarouselSlides.AddRange(
+            new CarouselSlide
+            {
+                ImageUrl = "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=2000&q=85",
+                AltText = "Rows of server racks in a modern data center",
+                Label = "Reliable infrastructure",
+                Description = "Dependable technology and infrastructure to keep your business connected.",
+                Title = "Technology built for business",
+                SortOrder = 0
+            },
+            new CarouselSlide
+            {
+                ImageUrl = "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=2000&q=85",
+                AltText = "Close-up of modern computer components and circuit board",
+                Label = "Hardware and systems",
+                Description = "Business-ready hardware and systems selected to support your day-to-day work.",
+                Title = "The right tools for every workday",
+                SortOrder = 1
+            },
+            new CarouselSlide
+            {
+                ImageUrl = "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=2000&q=85",
+                AltText = "Bright, connected modern office workspace",
+                Label = "Support that stays with you",
+                Description = "Practical guidance and ongoing support from setup through everyday use.",
+                Title = "A practical partner for your next step",
+                SortOrder = 2
+            });
+
         await db.SaveChangesAsync();
     }
 

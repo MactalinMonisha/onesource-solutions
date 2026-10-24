@@ -21,6 +21,9 @@ namespace OneSource.Api.Models
         [MaxLength(1000)]
         public string? ProductDescription { get; set; }
 
+        [MaxLength(100)]
+        public string? ProductCode { get; set; }
+
         public bool IsActive { get; set; } = true;
 
         public DateTime CreatedDate { get; set; }

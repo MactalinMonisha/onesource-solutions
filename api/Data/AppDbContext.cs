@@ -10,6 +10,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
     public DbSet<User> Users => Set<User>();
     public DbSet<Contact> Contacts => Set<Contact>();
+    public DbSet<ContactDetail> ContactDetails => Set<ContactDetail>();
+    public DbSet<CarouselSlide> CarouselSlides => Set<CarouselSlide>();
     public DbSet<Offer> Offers => Set<Offer>();
     public DbSet<TrustedCompany> TrustedCompanies => Set<TrustedCompany>();
     public DbSet<AboutContent> AboutContents => Set<AboutContent>();
@@ -29,6 +31,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasKey(p => p.ProductId);
             e.Property(p => p.ProductName).IsRequired().HasMaxLength(200);
             e.Property(p => p.ProductDescription).HasMaxLength(1000);
+            e.Property(p => p.ProductCode).HasMaxLength(100);
+            e.HasIndex(p => p.ProductCode).IsUnique();
 
             e.HasOne(p => p.Category)
                 .WithMany(c => c.Products)
@@ -63,6 +67,30 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(c => c.Email).HasMaxLength(255);
             e.Property(c => c.Location).HasMaxLength(500);
             e.Property(c => c.Website).HasMaxLength(255);
+            e.Property(c => c.EnquiryWhatsAppNumber).HasMaxLength(20);
+        });
+
+        modelBuilder.Entity<ContactDetail>(e =>
+        {
+            e.HasKey(d => d.ContactDetailId);
+            e.Property(d => d.Label).IsRequired().HasMaxLength(100);
+            e.Property(d => d.Value).IsRequired().HasMaxLength(500);
+            e.Property(d => d.Type).IsRequired().HasMaxLength(20);
+
+            e.HasOne(d => d.Contact)
+                .WithMany(c => c.Details)
+                .HasForeignKey(d => d.ContactId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<CarouselSlide>(e =>
+        {
+            e.HasKey(slide => slide.CarouselSlideId);
+            e.Property(slide => slide.ImageUrl).IsRequired().HasMaxLength(1000);
+            e.Property(slide => slide.AltText).IsRequired().HasMaxLength(250);
+            e.Property(slide => slide.Label).IsRequired().HasMaxLength(120);
+            e.Property(slide => slide.Description).IsRequired().HasMaxLength(500);
+            e.Property(slide => slide.Title).IsRequired().HasMaxLength(200);
         });
 
         modelBuilder.Entity<Offer>(e =>
